@@ -3,4 +3,4 @@
 
 require "decibels"
 
-Decibels::Application.new.build.run
+Decibels::Application.new.build.run([$PROGRAM_NAME, *ARGV])
