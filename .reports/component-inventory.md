@@ -12,17 +12,28 @@ unioned per component below.
 
 ## State of the port
 
-`lib/` on `ruby` contains three files:
+`lib/` on `ruby` now carries the window chrome, all three dialogs, two of the
+three stack pages and the stylesheet. The playback half of the app — the player
+page, the waveform, the transport controls and the media stream behind them —
+is still unwritten.
 
-| File | What it is |
-|---|---|
-| `lib/decibels.rb` | requires `decibels/application` |
-| `lib/decibels/application.rb` | placeholder app: `Gtk::Application` + `Adwaita::ApplicationWindow` + `Adwaita::ToolbarView` + empty `Adwaita::HeaderBar` + a "not written yet" `Adwaita::StatusPage` |
-| `lib/decibels/rb/version.rb` | gem version |
+| File | Upstream it came from | State |
+|---|---|---|
+| `lib/main.rb` | `src/main.ts` + `src/application.ts` | present (`App`: actions, accels, open handling, icon search path) |
+| `lib/decibels/application.rb` | — | present (alias `Decibels::Application = App`) |
+| `lib/window.rb` | `src/window.ts` + `data/window.blp` | partial — window, drag overlay, `empty`/`error` pages, `win.open-file`, `win.show-file`, file dialog. No `player` page, no `stream` property, no `player` action group, no `key_pressed_cb`, no title bindings, no `<Control>w` class shortcut (bound as an app accel instead) |
+| `lib/drag_overlay.rb` | `src/drag-overlay.ts` + `data/drag-overlay.blp` | present |
+| `lib/header_bar.rb` | `src/header.ts` + `data/header.blp` | present |
+| `lib/empty_state.rb` | `src/empty.ts` + `data/empty.blp` | present |
+| `lib/error_state.rb` | `src/error.ts` + `data/error.blp` | present |
+| `lib/shortcuts_dialog.rb` | `data/shortcuts-dialog.blp` | present |
+| `lib/about_dialog.rb` | `src/application.ts` (`show_about_dialog_cb`) | present (reads the port's own metainfo XML instead of `new_from_appdata`) |
+| `lib/style.rb` | `data/style.css` | present (loaded through `Gtk::CssProvider`) |
+| `lib/decibels/rb/version.rb` | — | gem version |
 
-**No user-facing component of upstream is ported.** The placeholder window is
-not upstream's window: it has no `Gtk::Stack`, no drag overlay, no pages, no
-menu, no actions, no accelerators, no player. Parity work starts from zero.
+Still absent, in dependency order: `lib/media_stream.rb`, `lib/waveform_generator.rb`,
+`lib/waveform_bar_chart.rb`, `lib/waveform_scale.rb`, `lib/playback_rate_button.rb`,
+`lib/volume_button.rb`, `lib/player_state.rb`, `lib/mpris.rb`.
 
 House shape to follow (from the pilot port `gnome-contacts-rb`): one upstream
 source file becomes one flat `lib/<thing>.rb`, the application class stays at
@@ -39,9 +50,10 @@ ported from, and widgets are memoized methods configured in `.tap` blocks.
 |---|---:|---|---|---|
 | — | — | — | — | `main(argv)` constructs `Application` and runs it |
 
-Port shape: `exe/decibels` requiring `decibels` and calling
-`Decibels::Application.new.build.run`. Nothing in the port yet beyond the stub
-`exe/decibels`. **Absent.**
+Port shape: `exe/decibels` requires `decibels` and calls
+`Decibels::Application.new.build.run`. Upstream's `main.ts` and
+`application.ts` are both folded into `lib/main.rb`'s `App`, since `main.ts`
+holds nothing but that one call. **Present.**
 
 ### `src/application.ts` → `lib/decibels/application.rb` — the application
 
@@ -59,7 +71,14 @@ About dialog, MPRIS and the open/activate handling.
 | CSS class | `devel` added to the window when the app id ends in `Devel` |
 | Other | `GLib.set_application_name(_("Audio Player"))`, `PULSE_PROP_application.icon_name`, `Gtk.Window.set_default_icon_name`, `notify::active-window` → hand the active window's stream to MPRIS (deferred on `notify::media-info` when the stream has not loaded a track yet), `vfunc_activate` → new window, `vfunc_open(files)` → load into the current empty window, else one new window per file, autoplay only for a single file |
 
-**Present as a stub only** — the file exists with none of the above.
+**Present** in `lib/main.rb` — actions, accelerators (`app.shortcuts` bound
+to `<Control>question`, `window.close` to `<Control>w` as an app accel rather
+than upstream's class-level `Gtk.Shortcut`), `handles_open`, `vfunc_open`'s
+single-file-into-the-empty-window rule, the stylesheet load and the icon-theme
+search path. **Still missing:** the MPRIS hand-off on
+`notify::active-window`, the `devel` CSS class for Devel builds, autoplay for a
+single opened file, `GLib.set_application_name`, the PulseAudio icon property
+and `resource_base_path`. App id is `org.rubygtkproject.Decibels`.
 
 ### `src/application.ts` (`show_about_dialog_cb`) → `lib/about_dialog.rb` — About dialog
 
@@ -67,10 +86,14 @@ About dialog, MPRIS and the open/activate handling.
 |---|---:|---|---|---|
 | `Adw.AboutDialog` | 1 | — | — | built with `new_from_appdata("/org/gnome/Decibels/<app-id>.metainfo.xml", version)`, then `set_version`, `set_developers` (Angelo Verlain, David Keller), `set_artists` (kramo), `set_designers` (Allan Day), `set_translator_credits(_("translator-credits"))`; presented on the active window |
 
-Upstream builds it inline in `application.ts`; the port should extract it to its
-own file per house style. The port has no GResource and no metainfo XML, so
-`new_from_appdata` is unavailable and every field must be set explicitly.
-**Absent.**
+Upstream builds it inline in `application.ts`; the port extracts it to its own
+file per house style. `new_from_appdata` needs the metainfo inside a
+GResource, which the port has not got, so `lib/about_dialog.rb` reads
+`data/<app-id>.metainfo.xml` off disk with a narrow regex reader (no REXML in
+the runtime bundle) and sets name, icon, developer name, version, license,
+URLs and release notes itself, plus the hand-written developer/artist/designer
+credits. **Present.** Missing: `set_translator_credits(_("translator-credits"))`,
+which needs gettext.
 
 ### `src/window.ts` + `data/window.blp` → `lib/window.rb` — the main window
 
@@ -100,7 +123,16 @@ own file per house style. The port has no GResource and no metainfo XML, so
 | Error strings | `_("File Cannot Be Played")`, `_("No available audio file found")`, `_("Directories Cannot Be Played")`, `_("Please select a file.")`, `_("The selected file is not a regular file.")`, `_("No file was selected")`, `"Couldn’t read the file"` (untranslated upstream) |
 | File loading | `query_info_async("standard::*", NOFOLLOW_SYMLINKS)`, branches on `REGULAR` / `DIRECTORY` / other; `Gtk.DialogError.DISMISSED` from the file dialog is swallowed |
 
-**Absent.**
+**Partial.** `lib/window.rb` has the window, the drag overlay, the stack with
+the `empty` and `error` pages, both `win.*` actions with `show-file` starting
+disabled, the file dialog with its `audio/*` filter, `load_file`/`load_uri`,
+`show_error` and the `Gtk::WindowGroup`. The window is *composed*, not
+subclassed — `Adwaita::ApplicationWindow` instantiates but does not usefully
+derive in these bindings — so the pages reach it through callbacks instead of
+`get_root`. **Missing:** the `player` stack page, the `stream` property and the
+`player` action group it supplies, `key_pressed_cb` (space / Left / Right /
+rate keys), the `stream.title`/`artist` → headerbar title bindings,
+`close-request` → `stream.reset()`, and the `devel` CSS class.
 
 ### `src/drag-overlay.ts` + `data/drag-overlay.blp` → `lib/drag_overlay.rb` — drag-and-drop overlay
 
@@ -116,7 +148,8 @@ Adapted upstream from Amberol. Wraps the stack and reveals a drop target hint.
 
 Dynamic CSS: `blurred` added to / removed from the overlay child. Error path:
 `_("Unable to access dropped files")` under `_("File Cannot Be Played")`.
-**Absent.**
+**Present** as `lib/drag_overlay.rb`; the `[content]` Buildable slot becomes a
+`content=` writer.
 
 ### `src/header.ts` + `data/header.blp` → `lib/header_bar.rb` — shared header bar and primary menu
 
@@ -139,7 +172,10 @@ Menu model `primary_menu` — 3 sections, 5 items:
 | 3 | `_("_Keyboard Shortcuts")` | `app.shortcuts` | |
 | 3 | `_("_About Audio Player")` | `app.about` | |
 
-**Absent.**
+**Present** as `lib/header_bar.rb`; `hidden-when: action-disabled` is set with
+`Gio::MenuItem#set_attribute_value`, and `render_title` builds the
+`Adwaita::WindowTitle` lazily and clears `title_widget` when the title is
+blank, as upstream does.
 
 ### `src/empty.ts` + `data/empty.blp` → `lib/empty_state.rb` — empty state (startup page)
 
@@ -152,7 +188,7 @@ Menu model `primary_menu` — 3 sections, 5 items:
 | `Gtk.Box` | 1 | — | — | vertical, spacing 12 |
 | `Gtk.Button` | 1 | `pill`, `suggested-action` | — | `label: _("_Open…")`, `use-underline`, `action-name: win.open-file`, `can-shrink`, `halign: center` |
 
-**Absent.**
+**Present** as `lib/empty_state.rb`.
 
 ### `src/error.ts` + `data/error.blp` → `lib/error_state.rb` — error state
 
@@ -165,7 +201,9 @@ Menu model `primary_menu` — 3 sections, 5 items:
 | `Gtk.Box` | 1 | — | — | vertical, spacing 12 |
 | `Gtk.Button` | 1 | `pill`, `suggested-action` | — | `label: _("_Try Again…")`, `use-underline`, `action-name: win.open-file`, `can-shrink`, `halign: center` |
 
-**Absent.**
+**Present** as `lib/error_state.rb`, including `show_error(title, error)` with
+the `_("An unknown error happened")` fallback. The header bar is exposed but
+not yet bound to a stream.
 
 ### `src/player.ts` + `data/player.blp` → `lib/player_state.rb` — the player page
 
@@ -321,7 +359,11 @@ A standalone blueprint object with no backing source file.
 | Playback Rate | Decrease Playback Rate | `<Ctrl>minus minus` |
 | Playback Rate | Reset Playback Rate | `<Ctrl>0 0` |
 
-**Absent.**
+**Present** as `lib/shortcuts_dialog.rb`. The `adwaita` gem does expose
+`ShortcutsDialog`, `ShortcutsSection` and `ShortcutsItem`; `ShortcutsItem.new`
+takes `(title, accelerator)` positionally, and items that name an action are
+built with an empty accelerator and get `action_name=` afterwards. `app.shortcuts`
+is installed explicitly, since nothing upstream installs it.
 
 ### `data/style.css` → `lib/style.rb` — stylesheet
 
@@ -333,30 +375,38 @@ Three classes, all applied from the code above:
 | `blurred` | `filter: blur(6px)` | `src/drag-overlay.ts`, dynamically |
 | `drag-overlay` | `box-shadow: none` | `data/drag-overlay.blp` |
 
-The port has no GResource, so the CSS must be loaded through a
-`Gtk::CssProvider` from a file shipped with the gem. **Absent.**
+**Present** as `lib/style.rb`: all three rules inline in the class, pushed onto
+the default display with `Gtk::StyleContext.add_provider_for_display` at
+`startup`.
 
 ## Non-widget parity surfaces
 
 | Surface | Upstream | State of the port |
 |---|---|---|
-| Custom icons | `data/icons/scalable/actions/`: `no-sound-symbolic`, `pause-large-symbolic`, `play-large-symbolic`, `skip-backwards-10-symbolic`, `skip-forward-10-symbolic`, `speedometer-symbolic` | absent; six buttons and the error page reference icons that are not in the system theme, so they must be shipped and added to the icon theme search path |
-| App icons | `org.gnome.Decibels.svg`, `-symbolic.svg`, `.Devel.svg` | absent; the empty state's icon name is derived from the app id |
-| Desktop entry | `org.gnome.Decibels.desktop.in.in` — `Name=Audio Player`, keywords, `DBusActivatable`, `X-SingleMainWindow`, 24 audio MIME types | absent |
-| AppStream metainfo | `org.gnome.Decibels.metainfo.xml.in.in` | absent; also the data source for the About dialog upstream |
-| D-Bus service file | `org.gnome.Decibels.service.in` | absent |
+| Custom icons | `data/icons/scalable/actions/`: `no-sound-symbolic`, `pause-large-symbolic`, `play-large-symbolic`, `skip-backwards-10-symbolic`, `skip-forward-10-symbolic`, `speedometer-symbolic` | **present** — all six under `data/icons/hicolor/scalable/actions/`, reached through `Gtk::IconTheme#add_search_path` at startup instead of a GResource |
+| App icons | `org.gnome.Decibels.svg`, `-symbolic.svg`, `.Devel.svg` | **present** for the port's own id: `data/icons/hicolor/scalable/apps/org.rubygtkproject.Decibels.svg` and `.../symbolic/apps/org.rubygtkproject.Decibels-symbolic.svg`, plus an `index.theme`. No `.Devel` variant, so there is no Devel build and no `devel` CSS class |
+| Desktop entry | `org.gnome.Decibels.desktop.in.in` — `Name=Audio Player`, keywords, `DBusActivatable`, `X-SingleMainWindow`, 24 audio MIME types | **present** as `data/org.rubygtkproject.Decibels.desktop` |
+| AppStream metainfo | `org.gnome.Decibels.metainfo.xml.in.in` | **present** as `data/org.rubygtkproject.Decibels.metainfo.xml`; also the data source `lib/about_dialog.rb` reads |
+| D-Bus service file | `org.gnome.Decibels.service.in` | **present** as `data/org.rubygtkproject.Decibels.service` |
 | GSettings schema | none upstream | n/a — there are no preferences and no preferences dialog in this app |
-| Translations | `po/` with 57 languages, `po/POTFILES.in` listing 10 `.blp`/data files and 7 `.ts` files; `_()` and `C_()` throughout; `C_("shortcut window", …)` and `C_("volume percentage", "%d %%")` contexts | no gettext wiring in the port at all |
+| Translations | `po/` with 57 languages, `po/POTFILES.in` listing 10 `.blp`/data files and 7 `.ts` files; `_()` and `C_()` throughout; `C_("shortcut window", …)` and `C_("volume percentage", "%d %%")` contexts | **absent** — no `po/`, no gettext wiring, every string a bare Ruby literal. This is the one parity surface that has not been started |
 
 ## Blockers and open questions
 
-1. **GStreamer bindings.** `src/stream.ts` and `src/waveform-generator.ts` need `Gst`, `GstPlay`, `GstPbUtils` and `GstAudio`. Confirm what the fork's `nix develop` shell provides before planning the player; without playback, only the empty state, the error state, the header and the shortcuts dialog can be ported.
+Resolved since the first survey:
+
+- `Adwaita::ShortcutsDialog`, `ShortcutsSection` and `ShortcutsItem` all exist in the `adwaita` gem (`ShortcutsItem.new` is positional).
+- `Adwaita::ApplicationWindow` can be *instantiated* but not usefully subclassed, so `lib/window.rb` composes it and hands the pages callbacks. Every page class does subclass `Adwaita::Bin` successfully.
+- The About dialog works without appdata in a GResource by reading the shipped metainfo XML directly.
+- The stylesheet works through `Gtk::CssProvider#load_from_string` plus `Gtk::StyleContext.add_provider_for_display`.
+
+Still open, all of them in the unported playback half:
+
+1. **GStreamer bindings.** `src/stream.ts` and `src/waveform-generator.ts` need `Gst`, `GstPlay`, `GstPbUtils` and `GstAudio`. Confirm what the fork's `nix develop` shell provides before planning the player; this gates `lib/media_stream.rb`, `lib/waveform_generator.rb`, `lib/player_state.rb` and both popover buttons, since every control targets a `player.*` action the stream installs.
 2. **`Gtk::MediaStream` subclassing.** `APMediaStream` subclasses `Gtk.MediaStream` and overrides its vfuncs. Ruby-bindings support for overriding GObject vfuncs on a GTK class needs verifying before `lib/media_stream.rb` is designed.
 3. **`Gdk::Paintable` implementation.** `APWaveformBarChart` implements a GInterface and overrides four of its vfuncs. Implementing GInterfaces from Ruby is the least certain part of this port.
 4. **Custom-drawn widget.** `APWaveformScale` overrides `vfunc_snapshot`, `vfunc_size_allocate` and `vfunc_css_changed`, and uses `Gsk` mask nodes and `Graphene`. If `Gsk`/snapshot is not reachable from Ruby, the waveform needs a Cairo `Gtk::DrawingArea` design instead, which changes the component's shape.
 5. **Blueprint closures.** `data/volume-button.blp` computes `icon-name` and `tooltip-text` with `bind $cb(...) as <string>` expressions. There is no declarative equivalent in the port; these become `notify::` handlers, and the inventory above records the logic so nothing is lost.
-6. **`app.shortcuts` has no installer upstream.** Nothing in `src/` installs it or loads `shortcuts-dialog.ui`; it relies on libadwaita 1.8 picking the resource up automatically. The port must install the action and present `Adwaita::ShortcutsDialog` explicitly — and confirm the Ruby `adwaita` gem exposes `ShortcutsDialog`, `ShortcutsSection` and `ShortcutsItem` at all.
-7. **About dialog without appdata.** `Adw.AboutDialog.new_from_appdata` needs the metainfo XML in a GResource. The port has neither, so every field is set by hand.
-8. **MPRIS over D-Bus from Ruby.** `src/mpris.ts` hand-rolls introspection XML and a method dispatcher. Confirm `Gio::DBusNodeInfo` and `register_object` are usable from the Ruby bindings.
-9. **`Adwaita::ApplicationWindow`.** The existing `lib/decibels/application.rb` uses it, but the `ruby-gtk` skill records `Adwaita::ApplicationWindow` as broken in these bindings and prescribes `Gtk::ApplicationWindow`. Resolve this before `lib/window.rb` is written, since every page hangs off that choice.
-10. **Multi-window app.** Upstream is `HANDLES_OPEN` with one stream per window and a `Gtk.WindowGroup` each; the placeholder port memoizes a single window on the application object. The window must become a per-instance class, not a memoized accessor on the application.
+6. **MPRIS over D-Bus from Ruby.** `src/mpris.ts` hand-rolls introspection XML and a method dispatcher. Confirm `Gio::DBusNodeInfo` and `register_object` are usable from the Ruby bindings.
+7. **Gettext.** 57 catalogues and three message contexts upstream, nothing in the port. Decide whether the port adopts `gettext` (and a `po/` of its own) or accepts untranslated strings as a documented parity gap, before the remaining files add more literals.
+8. **Keyboard parity depends on the player.** `key_pressed_cb`, the `<Control><Shift>leftarrow` managed `Gtk::ShortcutController` and seven of the ten shortcuts-dialog items all act on the stream, so the shortcuts dialog currently lists shortcuts that do nothing.
