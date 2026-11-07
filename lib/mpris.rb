@@ -213,7 +213,7 @@ class Mpris
 
     def disconnect_listeners
       if @stream
-        @stream_listeners.each { |listener_id| @stream.disconnect(listener_id) }
+        @stream_listeners.each { |listener_id| @stream.signal_handler_disconnect(listener_id) }
       end
       @stream_listeners = []
     end

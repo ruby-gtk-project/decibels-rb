@@ -50,7 +50,21 @@ class App
       app.signal_connect('startup') { startup }
       app.signal_connect('activate') { present_new_window }
       app.signal_connect('open') { |_app, files, _hint| open(files) }
-      app.signal_connect('notify::active-window') { mpris.sync_active_window }
+      # Deferred to an idle tick: AdwApplicationWindow fires this signal from
+      # inside its own constructor (registering itself as the active window
+      # as it builds), and a new window is not fully wrapped by the Ruby
+      # bindings until that constructor returns. Reading `app.active_window`
+      # synchronously from this handler re-enters the GObject introspection
+      # loader for the same, still-under-construction window and it raises
+      # "ruby wrapper for this GObject* already exists." Running it a tick
+      # later costs nothing visible — MPRIS retargets a moment after the
+      # window is already on screen either way.
+      app.signal_connect('notify::active-window') do
+        GLib::Idle.add do
+          mpris.sync_active_window
+          false
+        end
+      end
 
       ACTIONS.each do |name, handler|
         Gio::SimpleAction.new(name).tap do |action|
