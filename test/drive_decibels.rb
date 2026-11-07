@@ -2,11 +2,9 @@
 
 # Drives the whole port headlessly: builds the application, opens a window,
 # walks it through the empty state, both error states, a successfully
-# accepted file, the drag overlay's wiring, the header bar's menu, both
-# dialogs, the app-level actions/accelerators, and the four playback widgets
-# that exist in lib/ but are not yet wired into any window (there is no
-# player page to host them — see .reports/component-inventory.md). It
-# screenshots each state.
+# accepted and played file, the drag overlay's wiring, the header bar's
+# menu, both dialogs, the app-level actions/accelerators, and the player
+# page's own widgets. It screenshots each state.
 #
 # Run it from the repository root:
 #
@@ -34,8 +32,15 @@ SHOTS = File.expand_path('../tmp/shots', __dir__)
 FileUtils.rm_rf(SHOTS)
 
 ROOT = File.expand_path('..', __dir__)
-REGULAR_FILE = File.expand_path('data/org.rubygtkproject.Decibels.desktop', ROOT)
 MISSING_FILE = '/definitely/missing-file-decibels.mp3'
+
+# A real, short, decodable audio file: the window now actually loads and
+# plays whatever is accepted (MediaStream discovers and plays it through
+# GstPlay), so the fixture has to be real audio, not merely "a regular
+# file" the way the application's own .desktop file stood in before there
+# was anything to play it with.
+REGULAR_FILE = File.join(Dir.mktmpdir('decibels-drive-fixture'), 'fixture.wav')
+system("gst-launch-1.0 -q audiotestsrc num-buffers=100 ! audioconvert ! wavenc ! filesink location=#{REGULAR_FILE}", exception: true)
 
 GtkDriver.drive(App.new, shots: SHOTS) do |d, app|
   d.window { app.windows.first&.window }

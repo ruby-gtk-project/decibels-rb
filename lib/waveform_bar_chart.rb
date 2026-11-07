@@ -36,8 +36,13 @@ class WaveformBarChart
 
   def peaks = @peaks_mipmaps.first
 
+  # An empty array means the same thing as nil here — no peaks to draw —
+  # and has to be treated that way: `#bars` only skips drawing when
+  # `@peaks_mipmaps` is empty, and `Math.log2(0)` in `#mipmap_for` would
+  # crash the next draw if an empty peaks array were wrapped into it as
+  # `[[]]` instead.
   def peaks=(peaks)
-    if peaks.nil?
+    if peaks.nil? || peaks.empty?
       @peaks_mipmaps = []
     else
       @peaks_mipmaps = [peaks]

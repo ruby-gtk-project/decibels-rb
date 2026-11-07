@@ -26,6 +26,20 @@
           harfbuzz
           librsvg
         ]
+        # GStreamer: the playback engine. `gst-plugins-base` carries the
+        # GstAudio typelib the `gstreamer` gem's init_audio loads, and
+        # `gst-plugins-good`/`-bad` carry the decoders (playbin3, decodebin3)
+        # and the GstPlay/GstPbutils typelibs this port loads generically
+        # through GObjectIntrospection (there is no dedicated ruby-gnome gem
+        # for either). GST_PLUGIN_SYSTEM_PATH_1_0 is what the GStreamer
+        # registry scans for element plugins; GI_TYPELIB_PATH (below) is the
+        # unrelated introspection search path.
+        ++ (with pkgs.gst_all_1; [
+          gstreamer
+          gst-plugins-base
+          gst-plugins-good
+          gst-plugins-bad
+        ])
         # The Ruby `pkg-config` gem resolves `Requires.private` transitively and
         # hard-fails if any .pc in the chain is missing, so gtk4's whole private
         # closure has to be on PKG_CONFIG_PATH, not just its public deps.
@@ -55,6 +69,13 @@
           libdeflate
           xz
           zstd
+          # gstreamer.pc's Requires.private chain reaches libunwind and
+          # elfutils' libdw (both used for optional backtrace support), so the
+          # gstreamer gem's extconf needs them on PKG_CONFIG_PATH too.
+          libunwind
+          elfutils
+          # orc-0.4: GStreamer's SIMD runtime, required transitively too.
+          orc
         ])
         # Un-prefixed names: the `xorg.*` package set is deprecated.
         ++ (with pkgs; [
@@ -87,6 +108,7 @@
           graphene1 = rubyGnomeGem;
           adwaita = rubyGnomeGem;
           rsvg2 = rubyGnomeGem;
+          gstreamer = rubyGnomeGem;
         };
 
         # `makeSearchPath` would take each package's *first* output, and glib's
@@ -94,6 +116,15 @@
         # `.out`. at-spi2-core is here for the Atk typelib.
         typelibPath = pkgs.lib.makeSearchPath "lib/girepository-1.0"
           (map (drv: drv.out or drv) (gtkStack ++ [ pkgs.at-spi2-core ]));
+
+        # Where GStreamer's registry finds element plugins (playbin3,
+        # decodebin3, the decoders). Unrelated to GI_TYPELIB_PATH above.
+        gstPluginPath = pkgs.lib.makeSearchPath "lib/gstreamer-1.0" (with pkgs.gst_all_1; [
+          gstreamer
+          gst-plugins-base
+          gst-plugins-good
+          gst-plugins-bad
+        ]);
 
         # nix/ and not the repo root: the root Gemfile is kettle-jem's
         # development bundle — rubocop, rspec, yard, the kettle-dev stack — and
@@ -160,6 +191,7 @@
               --add-flags "-I$out/share/decibels/lib" \
               --add-flags "$out/share/decibels/exe/${launcher}" \
               --set GI_TYPELIB_PATH "${typelibPath}" \
+              --set GST_PLUGIN_SYSTEM_PATH_1_0 "${gstPluginPath}" \
               --prefix XDG_DATA_DIRS : "$out/share" \
               --prefix XDG_DATA_DIRS : "$out/share/gsettings-schemas/decibels-0.1.0" \
               --prefix XDG_DATA_DIRS : "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}" \
@@ -208,6 +240,7 @@
           shellHook = ''
             export XDG_DATA_DIRS="${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${pkgs.gtk4}/share/gsettings-schemas/${pkgs.gtk4.name}:${pkgs.adwaita-icon-theme}/share:$XDG_DATA_DIRS"
             export GI_TYPELIB_PATH="${typelibPath}''${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}"
+            export GST_PLUGIN_SYSTEM_PATH_1_0="${gstPluginPath}''${GST_PLUGIN_SYSTEM_PATH_1_0:+:$GST_PLUGIN_SYSTEM_PATH_1_0}"
             export RUBYLIB="$PWD/lib''${RUBYLIB:+:$RUBYLIB}"
             [ -d data/schemas ] && export GSETTINGS_SCHEMA_DIR="$PWD/data/schemas"
             unset BUNDLE_GEMFILE BUNDLE_FROZEN

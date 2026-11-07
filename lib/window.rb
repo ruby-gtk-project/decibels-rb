@@ -5,6 +5,8 @@ require 'adwaita'
 require_relative 'drag_overlay'
 require_relative 'empty_state'
 require_relative 'error_state'
+require_relative 'media_stream'
+require_relative 'player_state'
 
 # Window is one audio-player window.
 #
@@ -33,7 +35,7 @@ class Window
   DIRECTORY_MESSAGE = 'Please select a file.'
   IRREGULAR = 'The selected file is not a regular file.'
 
-  attr_reader :app, :file
+  attr_reader :app, :file, :stream
 
   def initialize(app, icon_name)
     @app = app
@@ -51,6 +53,7 @@ class Window
         win.content = drag_overlay.build
         win.add_action(open_file_action)
         win.add_action(show_file_action)
+        win.insert_action_group('player', stream.action_group)
       end
 
       drag_overlay.content = stack
@@ -58,11 +61,14 @@ class Window
       stack.tap do |pages|
         pages.add_named(empty_state.build, 'empty')
         pages.add_named(error_state.build, 'error')
+        pages.add_named(player_state.build, 'player')
         pages.visible_child_name = 'empty'
       end
 
       open_file_action.signal_connect('activate') { open_file }
       show_file_action.signal_connect('activate') { show_file }
+
+      stream.on_error { |error| show_error(CANNOT_BE_PLAYED, error) }
     end
   end
 
@@ -124,9 +130,13 @@ class Window
 
   def stack = @stack ||= Gtk::Stack.new
 
+  def stream = @stream ||= MediaStream.new
+
   def empty_state = @empty_state ||= EmptyState.new(@icon_name)
 
   def error_state = @error_state ||= ErrorState.new
+
+  def player_state = @player_state ||= PlayerState.new(stream)
 
   def open_file_action = @open_file_action ||= Gio::SimpleAction.new('open-file')
 
@@ -164,6 +174,8 @@ class Window
       when Gio::FileType::REGULAR
         @file = file
         show_file_action.enabled = true
+        stack.visible_child_name = 'player'
+        stream.set_file(file)
       when Gio::FileType::DIRECTORY
         show_error(DIRECTORY_TITLE, DIRECTORY_MESSAGE)
       else

@@ -66,3 +66,4 @@ group :development do
   gem "rubocop"
 end
 gem "adwaita"
+gem "gstreamer"
