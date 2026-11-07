@@ -76,9 +76,9 @@ class WaveformScale < Gtk::DrawingArea
     end
 
     def seek_to(x)
-      width = get_width
-      if width > 0
-        self.position = (x / width).clamp(0.0, 1.0)
+      current_width = width
+      if current_width > 0
+        self.position = (x / current_width).clamp(0.0, 1.0)
         @on_position_changed.each { |block| block.call(position) }
       end
     end
