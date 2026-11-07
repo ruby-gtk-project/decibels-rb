@@ -3,6 +3,7 @@
 require 'adwaita'
 
 require_relative 'about_dialog'
+require_relative 'mpris'
 require_relative 'shortcuts_dialog'
 require_relative 'style'
 require_relative 'window'
@@ -49,6 +50,7 @@ class App
       app.signal_connect('startup') { startup }
       app.signal_connect('activate') { present_new_window }
       app.signal_connect('open') { |_app, files, _hint| open(files) }
+      app.signal_connect('notify::active-window') { mpris.sync_active_window }
 
       ACTIONS.each do |name, handler|
         Gio::SimpleAction.new(name).tap do |action|
@@ -69,10 +71,24 @@ class App
 
   def windows = @windows ||= []
 
+  # The org.mpris.MediaPlayer2 D-Bus service, ported from upstream's
+  # src/mpris.ts and src/application.ts. Built lazily since the first
+  # window (and therefore the first stream worth reporting) only exists
+  # once `present_new_window` has run at least once.
+  def mpris = @mpris ||= Mpris.new(self)
+
+  # The stream belonging to the application's currently active window, if
+  # any — what upstream's `active_window_changed_cb` reads off
+  # `this.active_window` directly, since this port's windows are composed
+  # rather than subclassed (see window.rb's class comment).
+  def active_stream = windows.find { |window| window.window == app.active_window }&.stream
+
   def present_new_window
     Window.new(app, SYMBOLIC_ICON).build.tap do |window|
       windows.push(window)
       window.present
+      mpris.build
+      mpris.sync_active_window
     end
   end
 

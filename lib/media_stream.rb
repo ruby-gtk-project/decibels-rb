@@ -82,12 +82,20 @@ class MediaStream < Gtk::MediaStream
     @discoverer_generation = 0
     @on_error = []
     @on_loaded = []
+    @on_media_info_updated = []
     @waveform_generator = WaveformGenerator.new
   end
 
   def on_error(&block) = @on_error << block
 
   def on_loaded(&block) = @on_loaded << block
+
+  # Fired once GstPlay's MEDIA_INFO_UPDATED message has set @media_info —
+  # the point at which #title/#artist/#get_duration stop being guesses.
+  # mpris.rb uses this to defer switching the MPRIS service to a newly
+  # active window's stream until it actually has something playing,
+  # mirroring upstream's own "notify::media-info" listener.
+  def on_media_info_updated(&block) = @on_media_info_updated << block
 
   def rate = @rate
 
@@ -310,6 +318,7 @@ class MediaStream < Gtk::MediaStream
       info = GstPlay.play_message_parse_media_info_updated(message)
       @media_info = info
       @tags = info.tags
+      @on_media_info_updated.each(&:call)
 
       unless prepared?
         stream_prepared(
