@@ -34,13 +34,15 @@ FileUtils.rm_rf(SHOTS)
 ROOT = File.expand_path('..', __dir__)
 MISSING_FILE = '/definitely/missing-file-decibels.mp3'
 
-# A real, short, decodable audio file: the window now actually loads and
-# plays whatever is accepted (MediaStream discovers and plays it through
-# GstPlay), so the fixture has to be real audio, not merely "a regular
-# file" the way the application's own .desktop file stood in before there
-# was anything to play it with.
+# A real, decodable audio file: the window now actually loads and plays
+# whatever is accepted (MediaStream discovers and plays it through GstPlay),
+# so the fixture has to be real audio, not merely "a regular file" the way
+# the application's own .desktop file stood in before there was anything to
+# play it with. 2000 buffers at the default 1024 samples/buffer, 44.1kHz is
+# ~46s - long enough that a 10s skip-forward/skip-back pair (the player
+# page's transport buttons) lands mid-file instead of overrunning into EOS.
 REGULAR_FILE = File.join(Dir.mktmpdir('decibels-drive-fixture'), 'fixture.wav')
-system("gst-launch-1.0 -q audiotestsrc num-buffers=100 ! audioconvert ! wavenc ! filesink location=#{REGULAR_FILE}", exception: true)
+system("gst-launch-1.0 -q audiotestsrc num-buffers=2000 ! audioconvert ! wavenc ! filesink location=#{REGULAR_FILE}", exception: true)
 
 GtkDriver.drive(App.new, shots: SHOTS) do |d, app|
   d.window { app.windows.first&.window }
@@ -146,6 +148,116 @@ GtkDriver.drive(App.new, shots: SHOTS) do |d, app|
     window = app.windows.first
     d.check('the file was recorded') { window.file&.basename == File.basename(REGULAR_FILE) }
     d.check('show-file is enabled now') { window.show_file_action.enabled? }
+    d.check('the stack switched to the player page') { window.stack.visible_child_name == 'player' }
+    d.shot('03a-player-empty')
+  end
+
+  d.step('discovery runs on a background thread, so this step is a pause for it to settle') {}
+
+  d.step('the stream discovered the real file and started autoplaying') do
+    window = app.windows.first
+    d.check('a positive duration was discovered') { window.stream.get_duration.positive? }
+    d.check('autoplay started it playing') { window.stream.playing? }
+    d.check('the play/pause button shows the pause icon') do
+      window.player_state.send(:playback_image).icon_name == 'pause-large-symbolic'
+    end
+    d.shot('03b-player-playing')
+  end
+
+  d.step('clicking the real play/pause button pauses the stream') do
+    window = app.windows.first
+    window.player_state.send(:playback_button).signal_emit('clicked')
+  end
+
+  d.step('playback paused and the button flipped back to play') do
+    window = app.windows.first
+    player = window.player_state
+    d.check('the stream is paused') { !window.stream.playing? }
+    d.check('the icon switched to play') { player.send(:playback_image).icon_name == 'play-large-symbolic' }
+    d.check('the tooltip says Play') { player.send(:playback_button).tooltip_text == 'Play' }
+  end
+
+  d.step('clicking skip-forward advances the timestamp through the real stream') do
+    window = app.windows.first
+    @before_skip = window.stream.timestamp
+    window.player_state.send(:skip_forward_button).signal_emit('clicked')
+  end
+
+  d.step('skip-forward moved the timestamp ahead') do
+    window = app.windows.first
+    d.check('the timestamp advanced') { window.stream.timestamp > @before_skip }
+    d.check('the timestamp label updated') { window.player_state.send(:timestamp_label).label != '00:00' }
+  end
+
+  d.step('clicking skip-back brings the timestamp back down') do
+    window = app.windows.first
+    @before_skip_back = window.stream.timestamp
+    window.player_state.send(:skip_back_button).signal_emit('clicked')
+  end
+
+  d.step('skip-back moved the timestamp down again') do
+    window = app.windows.first
+    d.check('the timestamp decreased') { window.stream.timestamp < @before_skip_back }
+    d.shot('03c-player-skipped')
+  end
+
+  # Gtk::Widget#activate_action is a ruby-gnome binding gap: it never routes
+  # through a group registered with #insert_action_group on that same
+  # widget, confirmed here with a trivial Gio::SimpleActionGroup outside
+  # this app entirely (window.activate_action('grp.ping', nil) never fires
+  # an action that window.lookup_action_group would find and fire directly).
+  # The group itself - the thing this port actually builds and wires with
+  # `win.insert_action_group('player', stream.action_group)` - works, so
+  # these steps drive it the way that is actually reachable.
+  d.step('firing player.play-pause on the installed action group resumes playback') do
+    window = app.windows.first
+    window.stream.action_group.activate_action('play-pause', nil)
+  end
+
+  d.step('the action toggled playback back on, same as the button would') do
+    window = app.windows.first
+    d.check('the stream is playing again') { window.stream.playing? }
+    d.check('the icon switched back to pause') { window.player_state.send(:playback_image).icon_name == 'pause-large-symbolic' }
+  end
+
+  d.step('firing player.toggle-mute on the installed action group mutes the stream') do
+    window = app.windows.first
+    window.stream.action_group.activate_action('toggle-mute', nil)
+  end
+
+  d.step('the stream and the real volume button both reflect the mute') do
+    window = app.windows.first
+    d.check('the stream reports muted') { window.stream.muted? }
+    d.check('the volume button mirrors it') { window.player_state.send(:volume_button).muted }
+    d.check('its icon switched to muted') { window.player_state.send(:volume_button).send(:menu_button).icon_name == 'audio-volume-muted-symbolic' }
+    window.stream.action_group.activate_action('toggle-mute', nil)
+  end
+
+  d.step('the unmute landed too') do
+    window = app.windows.first
+    d.check('the stream is unmuted again') { !window.stream.muted? }
+  end
+
+  d.step('moving the playback-rate button\'s real slider changes the stream\'s rate') do
+    window = app.windows.first
+    # rate= alone only syncs the display (as the standalone-widget steps
+    # above already proved); #change_rate is what the slider's own
+    # "change-value" signal calls, so this fires that same private path
+    # rather than the public setter, to go through the callback for real.
+    window.player_state.send(:playback_rate_button).send(:change_rate, 1.5)
+  end
+
+  d.step('the rate change callback reached the real stream') do
+    window = app.windows.first
+    d.check('the stream rate updated') { window.stream.rate == 1.5 }
+    window.player_state.send(:playback_rate_button).send(:change_rate, PlaybackRateButton::DEFAULT_RATE)
+  end
+
+  d.step('pausing again before the drag-overlay steps reuse this window') do
+    window = app.windows.first
+    if window.stream.playing?
+      window.stream.pause
+    end
   end
 
   d.step('the drag overlay accepts a dropped file through the same path') do

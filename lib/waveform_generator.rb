@@ -108,7 +108,7 @@ class WaveformGenerator
 
     def teardown
       if @watch_id && @bus
-        @bus.disconnect(@watch_id)
+        @bus.signal_handler_disconnect(@watch_id)
         @bus.remove_signal_watch
       end
       @pipeline&.set_state(Gst::State::NULL)
