@@ -12,10 +12,23 @@ unioned per component below.
 
 ## State of the port
 
-`lib/` on `ruby` now carries the window chrome, all three dialogs, two of the
-three stack pages and the stylesheet. The playback half of the app — the player
-page, the waveform, the transport controls and the media stream behind them —
-is still unwritten.
+**This section was stale and has been corrected.** The previous version of
+this document (as of commit `7eafb66`) was written *before* commit `dfdb671`
+("Port the waveform bar chart/scale and the playback-rate/volume buttons")
+landed, and listed `lib/waveform_bar_chart.rb`, `lib/waveform_scale.rb`,
+`lib/playback_rate_button.rb` and `lib/volume_button.rb` as **absent** even
+though a later audit (`.reports/COMPONENT_IDENTIFICATION.md`, from commit
+`10b926a`) claimed to have re-verified the inventory against the tree and
+found "no drift" — that audit was run against the stale document too and
+missed the same four files. All four exist in `lib/` right now and are
+re-surveyed below.
+
+`lib/` on `ruby` now carries the window chrome, all three dialogs, the
+stylesheet, the waveform bar-chart/scale, and the playback-rate and volume
+buttons — but the four standalone widget files are not wired to anything yet:
+there is still no `player` stack page, no media stream, and no waveform
+generator to feed them. Nothing produces sound and nothing drives the
+waveform's bars from a real file.
 
 | File | Upstream it came from | State |
 |---|---|---|
@@ -29,11 +42,14 @@ is still unwritten.
 | `lib/shortcuts_dialog.rb` | `data/shortcuts-dialog.blp` | present |
 | `lib/about_dialog.rb` | `src/application.ts` (`show_about_dialog_cb`) | present (reads the port's own metainfo XML instead of `new_from_appdata`) |
 | `lib/style.rb` | `data/style.css` | present (loaded through `Gtk::CssProvider`) |
+| `lib/waveform_bar_chart.rb` | `src/waveform-bar-chart.ts` | **present, as of `dfdb671`** — plain Ruby object (no `Gdk::Paintable`), computes bar geometry; painting moved into `WaveformScale` itself |
+| `lib/waveform_scale.rb` | `src/waveform-scale.ts` | **present, as of `dfdb671`** — `Gtk::DrawingArea` with a `draw_func` (no `vfunc_snapshot`/GSK mask), click + drag gestures, a timer-driven grow-in animation in place of `Adw.TimedAnimation`. Not yet instantiated by any page |
+| `lib/playback_rate_button.rb` | `src/playback-rate-button.ts` + `data/playback-rate-button.blp` | **present, as of `dfdb671`** — standalone `Adwaita::Bin`, takes an `on_rate_change:` callback instead of binding to `window.stream`. Not yet instantiated by any page |
+| `lib/volume_button.rb` | `src/volume-button.ts` + `data/volume-button.blp` | **present, as of `dfdb671`** — standalone `Adwaita::Bin`, takes `on_volume_change:`/`on_mute_toggle:` callbacks. Not yet instantiated by any page; strings (`'Mute/Unmute'`, `'Muted'`, `'Full Volume'`) are plain Ruby literals, not marked for translation |
 | `lib/decibels/rb/version.rb` | — | gem version |
 
 Still absent, in dependency order: `lib/media_stream.rb`, `lib/waveform_generator.rb`,
-`lib/waveform_bar_chart.rb`, `lib/waveform_scale.rb`, `lib/playback_rate_button.rb`,
-`lib/volume_button.rb`, `lib/player_state.rb`, `lib/mpris.rb`.
+`lib/player_state.rb`, `lib/mpris.rb`.
 
 House shape to follow (from the pilot port `gnome-contacts-rb`): one upstream
 source file becomes one flat `lib/<thing>.rb`, the application class stays at
@@ -252,7 +268,11 @@ Helpers: `seconds_to_string`, `micro_to_seconds`, `micro_to_string`. **Absent.**
 | `Gtk.Adjustment` `adjustment` | 1 (type) | — | — | lower 0.5, upper 3, value 1, step 0.5; bound to `stream.rate` with SYNC_CREATE |
 
 `adjust_value(increase)` steps the rate by `step_increment`. Wiring happens in
-`vfunc_root` on `notify::stream`. **Absent.**
+`vfunc_root` on `notify::stream`. **Present** as `lib/playback_rate_button.rb`
+(commit `dfdb671`) — the menu button, label, popover and vertical inverted
+scale with its four marks are all built; `rate=` syncs the label/slider and
+`on_rate_change:` fires in place of the property binding. **Not yet wired to
+anything**: no page instantiates it, so it has no `stream` to read or drive.
 
 ### `src/volume-button.ts` + `data/volume-button.blp` → `lib/volume_button.rb`
 
@@ -271,7 +291,14 @@ Icon logic (`menu_button_icon_cb`): muted or 0 → `audio-volume-muted-symbolic`
 `mute_button_icon_cb`: muted → `…-muted-symbolic`, else `…-high-symbolic`.
 `tooltip_text_cb`: `_("Muted")`, `_("Full Volume")`, else `C_("volume percentage", "%d %%")`.
 These are blueprint `bind $cb(...)` closures with no Ruby-bindings equivalent;
-the port reimplements them as `notify::` handlers. **Absent.**
+the port reimplements them as `notify::` handlers. **Present** as
+`lib/volume_button.rb` (commit `dfdb671`) — menu button, popover, mute toggle
+and horizontal scale are all built, and `update_icons`/`menu_button_icon`/
+`mute_button_icon`/`tooltip_text` reproduce the four closures exactly,
+callback-driven instead of property-bound. **Not yet wired to anything**: no
+page instantiates it. **Also not yet translated**: `'Mute/Unmute'`, `'Muted'`
+and `'Full Volume'` are bare Ruby string literals, where upstream marks all
+three with `_()`/accessibility labels.
 
 ### `src/waveform-scale.ts` → `lib/waveform_scale.rb` — the waveform seek bar
 
@@ -288,7 +315,16 @@ A hand-drawn `Gtk.Widget` subclass; no `.blp`.
 | Colours | `Adw.StyleManager` accent colour via `Adw.accent_color_to_standalone_rgba`; current colour alpha × 0.9 (high contrast) or × 0.55; recomputed in `vfunc_css_changed` |
 | Other vfuncs | `vfunc_size_allocate` invalidates the cache; accessibility `VALUE_MIN`/`VALUE_MAX`/`VALUE_NOW` updated via `Gtk.AccessibleProperty` |
 
-**Absent.**
+**Present** as `lib/waveform_scale.rb` (commit `dfdb671`) — a
+`Gtk::DrawingArea` with a `draw_func` standing in for `vfunc_snapshot` (per
+the skill's note: the Ruby bindings expose neither vfunc overrides nor a
+custom CSS element name here), `Gtk::GestureClick`/`Gtk::GestureDrag` for
+seek, and a `GLib::Timeout`-driven grow-in in place of `Adw.TimedAnimation`.
+The GSK mask-node duotone paint is replaced with painting each bar directly
+in the accent or dimmed color depending on which side of the play position it
+falls on — same visual result, no mask node. **Not yet wired to anything**:
+no page instantiates it, and nothing feeds it peaks or a position; no
+accessibility properties are set (upstream's `VALUE_MIN`/`MAX`/`NOW`).
 
 ### `src/waveform-bar-chart.ts` → `lib/waveform_bar_chart.rb` — the bar chart paintable
 
@@ -299,7 +335,14 @@ A hand-drawn `Gtk.Widget` subclass; no `.blp`.
 | Signals consumed by the scale | `invalidate-contents`, `notify::peaks` |
 | Interface vfuncs | `vfunc_snapshot`, `vfunc_get_intrinsic_width`/`_height`/`_aspect_ratio` |
 
-**Absent.**
+**Present** as `lib/waveform_bar_chart.rb` (commit `dfdb671`) — since the
+Ruby bindings cannot implement a GInterface's vfuncs, this is a plain Ruby
+object (not a real `Gdk::Paintable`) that hands back `[x, height]` bar pairs
+for a given width/height instead of painting itself; `WaveformScale` does the
+painting. The mipmap/interpolation algorithm is unchanged from upstream.
+`color`/`bar-width`/`bar-padding`/`mipmap-bias` are constructor
+options/readers rather than GObject properties, since nothing outside
+`WaveformScale` needs to bind to them.
 
 ### `src/waveform-generator.ts` → `lib/waveform_generator.rb` — peak extraction
 
@@ -399,14 +442,15 @@ Resolved since the first survey:
 - `Adwaita::ApplicationWindow` can be *instantiated* but not usefully subclassed, so `lib/window.rb` composes it and hands the pages callbacks. Every page class does subclass `Adwaita::Bin` successfully.
 - The About dialog works without appdata in a GResource by reading the shipped metainfo XML directly.
 - The stylesheet works through `Gtk::CssProvider#load_from_string` plus `Gtk::StyleContext.add_provider_for_display`.
+- **`Gdk::Paintable` implementation worked around.** Confirmed Ruby bindings cannot implement a GInterface's vfuncs; `lib/waveform_bar_chart.rb` is a plain Ruby object instead of a real `Gdk::Paintable`, handing back bar geometry for `WaveformScale` to paint.
+- **Custom-drawn widget worked around.** Confirmed no `vfunc_snapshot`/custom CSS element name from Ruby; `lib/waveform_scale.rb` is a `Gtk::DrawingArea` with a `draw_func`, and the GSK mask-node duotone trick is replaced by painting each bar directly in one of two colors.
+- **Blueprint closures ported.** `lib/volume_button.rb` reimplements `data/volume-button.blp`'s `bind $cb(...)` icon/tooltip closures as plain methods called from `update_icons`.
 
-Still open, all of them in the unported playback half:
+Still open, all of them gating the player page and the stream behind it:
 
-1. **GStreamer bindings.** `src/stream.ts` and `src/waveform-generator.ts` need `Gst`, `GstPlay`, `GstPbUtils` and `GstAudio`. Confirm what the fork's `nix develop` shell provides before planning the player; this gates `lib/media_stream.rb`, `lib/waveform_generator.rb`, `lib/player_state.rb` and both popover buttons, since every control targets a `player.*` action the stream installs.
+1. **GStreamer bindings.** `src/stream.ts` and `src/waveform-generator.ts` need `Gst`, `GstPlay`, `GstPbUtils` and `GstAudio`. Confirm what the fork's `nix develop` shell provides before planning the player; this gates `lib/media_stream.rb`, `lib/waveform_generator.rb` and `lib/player_state.rb`, since `player_state` is what instantiates `WaveformScale`/`PlaybackRateButton`/`VolumeButton` and wires their callbacks to a stream, and every button and shortcut targets a `player.*` action the stream installs.
 2. **`Gtk::MediaStream` subclassing.** `APMediaStream` subclasses `Gtk.MediaStream` and overrides its vfuncs. Ruby-bindings support for overriding GObject vfuncs on a GTK class needs verifying before `lib/media_stream.rb` is designed.
-3. **`Gdk::Paintable` implementation.** `APWaveformBarChart` implements a GInterface and overrides four of its vfuncs. Implementing GInterfaces from Ruby is the least certain part of this port.
-4. **Custom-drawn widget.** `APWaveformScale` overrides `vfunc_snapshot`, `vfunc_size_allocate` and `vfunc_css_changed`, and uses `Gsk` mask nodes and `Graphene`. If `Gsk`/snapshot is not reachable from Ruby, the waveform needs a Cairo `Gtk::DrawingArea` design instead, which changes the component's shape.
-5. **Blueprint closures.** `data/volume-button.blp` computes `icon-name` and `tooltip-text` with `bind $cb(...) as <string>` expressions. There is no declarative equivalent in the port; these become `notify::` handlers, and the inventory above records the logic so nothing is lost.
-6. **MPRIS over D-Bus from Ruby.** `src/mpris.ts` hand-rolls introspection XML and a method dispatcher. Confirm `Gio::DBusNodeInfo` and `register_object` are usable from the Ruby bindings.
-7. **Gettext.** 57 catalogues and three message contexts upstream, nothing in the port. Decide whether the port adopts `gettext` (and a `po/` of its own) or accepts untranslated strings as a documented parity gap, before the remaining files add more literals.
-8. **Keyboard parity depends on the player.** `key_pressed_cb`, the `<Control><Shift>leftarrow` managed `Gtk::ShortcutController` and seven of the ten shortcuts-dialog items all act on the stream, so the shortcuts dialog currently lists shortcuts that do nothing.
+3. **MPRIS over D-Bus from Ruby.** `src/mpris.ts` hand-rolls introspection XML and a method dispatcher. Confirm `Gio::DBusNodeInfo` and `register_object` are usable from the Ruby bindings.
+4. **Gettext.** 57 catalogues and three message contexts upstream, nothing in the port. Decide whether the port adopts `gettext` (and a `po/` of its own) or accepts untranslated strings as a documented parity gap. `lib/volume_button.rb`'s three strings (`'Mute/Unmute'`, `'Muted'`, `'Full Volume'`) already need to be revisited whichever way this is decided, since upstream marks all three with `_()`.
+5. **Keyboard parity depends on the player.** `key_pressed_cb`, the `<Control><Shift>leftarrow` managed `Gtk::ShortcutController` and seven of the ten shortcuts-dialog items all act on the stream, so the shortcuts dialog currently lists shortcuts that do nothing.
+6. **The four standalone widgets built so far are unreferenced.** `lib/waveform_bar_chart.rb`, `lib/waveform_scale.rb`, `lib/playback_rate_button.rb` and `lib/volume_button.rb` are not required by `lib/window.rb` or any other file in `lib/`, and nothing in the app instantiates them yet — they exist but are dead code until `lib/player_state.rb` is written and wires them to a stream.
