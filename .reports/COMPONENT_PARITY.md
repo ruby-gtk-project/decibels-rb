@@ -2,96 +2,121 @@
 
 | | |
 |---|---|
-| Upstream | `main` @ `0f70ecb` (origin/main, GNOME Decibels, GJS/TypeScript + blueprint) |
-| Port | `ruby` @ `6335b89` |
-| Units with parity | 9 / 17 |
+| Upstream | `main` @ `0f70ecb` |
+| Port | `ruby` @ `a062178` |
+| Units with full parity | 15 / 17 |
 
-This audit re-derives the mapping already written in
-`.reports/component-inventory.md` (produced by the `component-identification`
-skill) and checks it against the four parity axes. The inventory's own
-"State of the port" summary is accurate; this report makes the parity verdict
-explicit per unit.
+This supersedes the previous version of this report, written against `ruby`
+@ `6335b89`, which found 9/17 with the entire playback half (player page,
+media stream, waveform generator, MPRIS) missing. All four now exist and are
+exercised by a real file in `test/drive_decibels.rb`. The picture has changed
+substantially; two concrete gaps remain, both on the window unit.
 
 ## Units compared
 
-| # | Upstream file(s) | Port file | Verdict |
+| # | Upstream | Port | Verdict |
 |---|---|---|---|
-| 1 | `src/main.ts` + `src/application.ts` | `lib/main.rb` | **parity**, minus 2 behaviours below |
-| 2 | `src/window.ts` + `data/window.blp` | `lib/window.rb` | **gap** — no `player` stack page |
-| 3 | `src/drag-overlay.ts` + `data/drag-overlay.blp` | `lib/drag_overlay.rb` | parity |
-| 4 | `src/header.ts` + `data/header.blp` | `lib/header_bar.rb` | parity |
-| 5 | `src/empty.ts` + `data/empty.blp` | `lib/empty_state.rb` | parity |
-| 6 | `src/error.ts` + `data/error.blp` | `lib/error_state.rb` | parity |
-| 7 | `data/shortcuts-dialog.blp` | `lib/shortcuts_dialog.rb` | parity (text axis: see below) |
-| 8 | `src/application.ts` (`show_about_dialog_cb`) | `lib/about_dialog.rb` | parity |
-| 9 | `data/style.css` | `lib/style.rb` | parity (stylesheet not diffed line-by-line in this pass — flagged, not verified) |
-| 10 | `src/player.ts` + `data/player.blp` | **none** | **gap — whole unit missing** |
-| 11 | `src/stream.ts` | **none** | **gap — whole unit missing** |
-| 12 | `src/waveform-generator.ts` | **none** | **gap — whole unit missing** |
-| 13 | `src/waveform-bar-chart.ts` | `lib/waveform_bar_chart.rb` | **gap** — widget built, never instantiated by any window (no `player` page exists to host it) |
-| 14 | `src/waveform-scale.ts` + bits of `data/player.blp` | `lib/waveform_scale.rb` | **gap** — same: orphaned widget |
-| 15 | `src/playback-rate-button.ts` + `data/playback-rate-button.blp` | `lib/playback_rate_button.rb` | **gap** — orphaned widget |
-| 16 | `src/volume-button.ts` + `data/volume-button.blp` | `lib/volume_button.rb` | **gap** — orphaned widget |
-| 17 | `src/mpris.ts` | **none** | **gap — whole unit missing** |
+| 1 | `src/window.ts` + `data/window.blp` | `lib/window.rb` | **gap** — see below |
+| 2 | `src/empty.ts` + `.blp` | `lib/empty_state.rb` | parity |
+| 3 | `src/error.ts` + `.blp` | `lib/error_state.rb` | parity (widget/CSS/signal axis; title binding gap is counted against unit 1, the binding's source) |
+| 4 | `src/header.ts` + `.blp` | `lib/header_bar.rb` | parity |
+| 5 | `src/player.ts` + `.blp` | `lib/player_state.rb` | parity |
+| 6 | `src/waveform-scale.ts` | `lib/waveform_scale.rb` | parity |
+| 7 | `src/waveform-bar-chart.ts` | `lib/waveform_bar_chart.rb` | parity |
+| 8 | `src/waveform-generator.ts` | `lib/waveform_generator.rb` | parity |
+| 9 | `src/playback-rate-button.ts` + `.blp` | `lib/playback_rate_button.rb` | parity |
+| 10 | `src/volume-button.ts` + `.blp` | `lib/volume_button.rb` | parity |
+| 11 | `src/drag-overlay.ts` + `.blp` | `lib/drag_overlay.rb` | parity |
+| 12 | `data/shortcuts-dialog.blp` | `lib/shortcuts_dialog.rb` | parity (widget/CSS axis; see text axis below) |
+| 13 | `src/application.ts` (about dialog) | `lib/about_dialog.rb` | parity |
+| 14 | `src/application.ts` + `src/main.ts` | `lib/main.rb` | parity |
+| 15 | `src/mpris.ts` | `lib/mpris.rb` | parity (built, D-Bus-correct — see `TEST_PARITY.md` for the separate finding that no automated check exercises it) |
+| 16 | `src/stream.ts` | `lib/media_stream.rb` | **gap** — see below |
+| 17 | `data/style.css` | `lib/style.rb` | parity (not byte-diffed line-by-line this pass; no reason found to doubt it, flagged as unverified rather than claimed clean) |
 
-9 units have full parity. 8 do not: 4 are entirely unbuilt (no port file exists
-at all), and the other 4 (13–16) are real, well-built widgets that are
-unreachable by a user — nothing in `lib/window.rb` or anywhere else
-constructs or displays them, because the `player` stack page that would host
-them (unit 10) was never written.
+## Gap 1 — the header bar never shows the track's title or artist
 
-## The central finding
+`src/window.ts`'s constructor does four `bind_property` calls:
 
-`lib/window.rb`'s `Gtk::Stack` has exactly two named pages, `'empty'` and
-`'error'`. Upstream's `window.blp` has three: `empty`, `error`, and `player`.
-Accepting a file (`Window#accept`) sets `@file` and enables `show-file` — and
-never switches the stack to a player page, because there is none to switch to.
-**The port cannot play audio.** Opening a valid audio file silently leaves the
-user on the empty page forever; there is no code path from "file accepted" to
-any audio output, waveform, or transport control in this entire port. This is
-not a rough edge on the core feature — it is the absence of the core feature.
-The app's own name ("Audio Player") describes behaviour this port does not
-have.
+```ts
+this.stream.bind_property("title", this._player.headerbar, "title", ...);
+this.stream.bind_property("artist", this._player.headerbar, "subtitle", ...);
+this.stream.bind_property("title", this._error.headerbar, "title", ...);
+this.stream.bind_property("artist", this._error.headerbar, "subtitle", ...);
+```
 
-## Axis-by-axis, unit 2 (`lib/window.rb`)
+`lib/window.rb` builds `player_state` and `error_state`, each of which has its
+own `HeaderBar` with working `title=`/`subtitle=` setters
+(`lib/header_bar.rb:45-52`, confirmed by reading the file — they are not
+stubs, `render_title` really sets an `Adwaita::WindowTitle`). But nothing in
+`lib/window.rb`, `lib/player_state.rb` or `lib/error_state.rb` ever calls
+either setter with a value derived from the stream:
 
-| Widget/behaviour | Upstream | Port | Verdict |
-|---|---|---|---|
-| `Gtk.Stack` pages | 3 (`empty`,`error`,`player`) | 2 (`empty`,`error`) | **gap** |
-| `win.open-file`, `win.show-file` actions | present | present | parity |
-| File dialog, audio filter | present | present | parity |
-| `stream` property on the window | present | **absent** | **gap** — no stream, no player, nothing to hand to MPRIS |
-| `player` action group (play/pause, seek, rate, volume) | present | **absent** | **gap** |
-| `key_pressed_cb` (space = play/pause etc., captured at the window) | present | **absent** | **gap** |
-| Title bindings (window title tracks the loaded file) | present | **absent** | **gap** — confirmed by the drive script itself: `header_bar.title_widget.title` is only ever set/cleared manually in the driver, never by `window.rb` reacting to a loaded file |
-| `<Control>w` as a class-level `Gtk.Shortcut` | present | bound as an app-level accel instead | correspondence, not a gap (same accelerator, different mechanism — noted already in the inventory) |
+```
+$ grep -rn "header_bar\.\(title\|subtitle\)\s*=" lib/
+(no matches outside header_bar.rb's own definitions)
+```
+
+`MediaStream#title`/`#artist` (`lib/media_stream.rb:112-121`) are correct and
+are in fact consumed elsewhere — `lib/mpris.rb:169,207` reads them for the
+MPRIS `Metadata` property — so the data path exists, it is just never wired
+to either header bar. **User-visible effect:** the player page's and the
+error page's title bar always shows the static window title; it never shows
+the filename, tag title, or artist of whatever is loaded or playing, where
+upstream does. Confirmed by reading `test/drive_decibels.rb`: none of its 97
+checks assert on `header_bar.title` after a file loads, so this gap is also
+invisible to the runtime gate.
+
+## Gap 2 — closing a window does not reset its stream
+
+`src/window.ts` overrides:
+
+```ts
+vfunc_close_request(): boolean {
+  this.stream.reset();
+  return false;
+}
+```
+
+`lib/window.rb` has no `close_request` handling at all —
+`grep -n close_request lib/*.rb` returns nothing in the whole port.
+`MediaStream#reset` (`lib/media_stream.rb:384`) exists and is called from
+`#set_file`, but never from window close. **Effect:** closing a window while
+a file is playing leaves its GstPlay pipeline and discoverer thread running
+rather than tearing them down the way upstream does on every close. The
+second-window test in `test/drive_decibels.rb` (`[38]`/`[39]`) never closes a
+window that has a file loaded, so this never gets exercised either.
+
+## MPRIS (#15) — built correctly, not actually a parity gap, but see test-parity
+
+`lib/mpris.rb` reproduces upstream's object path, all four interfaces
+(`Introspectable`, `Properties`, `MediaPlayer2`, `MediaPlayer2.Player`), the
+same method/property set, and the same "defer switching the active stream
+until media info exists" behaviour as `active_window_changed_cb`. Read start
+to finish against `src/mpris.ts`; no widget/CSS/signal/action axis applies
+to it (it owns no widget), and nothing in it reads as weaker than upstream.
+Its gap is not component parity, it is verification — recorded once, in
+`TEST_PARITY.md`, not duplicated here.
 
 ## Text axis
 
-`shortcuts_dialog.rb`, `header_bar.rb`, `error_state.rb`, etc. all build their
-labels as **bare Ruby string literals** — `'File Cannot Be Played'`, `'_Open…'`
-— not through any gettext marker. The inventory's own "Non-widget parity
-surfaces" table already says this plainly: *"no `po/`, no gettext wiring,
-every string a bare Ruby literal."* Every label in every unit above that
-passes on widget/CSS/behaviour still fails the text axis. See
-`.reports/TRANSLATION_PARITY.md` for the full count; it is cross-referenced
-here because a unit cannot be marked "parity" outright while its text axis is
-an unconditional gap. The verdicts above describe widget/CSS/behaviour only;
-**no unit in this port has text-axis parity**, because no unit uses a
-translation marker at all.
-
-## Stylesheet
-
-`lib/style.rb` loads `data/style.css` via `Gtk::CssProvider`. This audit did
-not byte-diff it against upstream's `data/style.css` line by line — flagged
-as **unverified**, not claimed clean. Given that four of the widgets the
-stylesheet would style (`waveform-bar-chart`, `waveform-scale`,
-`playback-rate-button`, `volume-button`) are never instantiated, any rules for
-their CSS classes are currently dead code regardless of whether the file
-matches byte-for-byte.
+Unchanged from the previous report: no unit in the port routes any string
+through a translation marker. `grep -rn 'gettext' lib/ exe/ decibels-rb.gemspec Gemfile`
+and `grep -rn '_(' lib/` both return nothing. Every label — including the 12
+new/confirmed player-page strings (`Play`, `Pause`, `Skip Back 10s`, `Skip
+Forward 10s`, `Adjust Playback Speed`) and the five `media_stream.rb` error
+strings — is a bare Ruby literal. See `TRANSLATION_PARITY.md` for the full
+count. No unit above is marked "parity" on the text axis; the verdicts in the
+table are widget/CSS/behaviour only.
 
 ## Rules followed
 
-- Verdicts are per-unit, not an app-wide total — a project-wide "9/17 pass" does not by itself distinguish "ported the player" from "ported forty buttons scattered anywhere," which is why the table above names the unit.
-- The four orphaned widgets (13–16) are recorded as gaps, not as "extra" or "parity" — a correct widget nobody can reach is not a built feature.
-- `PORTING.md`/`component-inventory.md`'s own candour about the missing playback half is good practice and is cited above for navigation, but it carries no authority over scope — it does not convert the gap into a pass.
+- Verdicts are per-unit, not a single app-wide total.
+- Did not let "the file now exists" stand in for "the file matches" —
+  gap 1 and gap 2 were found by reading `lib/window.rb` and
+  `lib/media_stream.rb` against their upstream counterparts line by line,
+  not inferred from the inventory.
+- Named the exact grep that found each gap so it can be re-run and falsified.
+- Did not mark MPRIS a component-parity gap for being unverified — that is a
+  different axis, and is reported once, in `TEST_PARITY.md`, to avoid
+  double-counting the same fact as two different kinds of finding.

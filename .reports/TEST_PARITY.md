@@ -3,65 +3,76 @@
 | | |
 |---|---|
 | Upstream | `main` @ `0f70ecb` |
-| Port | `ruby` @ `6335b89` |
+| Port | `ruby` @ `a062178` |
 | Upstream tests | 0 |
 | Ported | 0 |
-| Gaps | 0 |
-| Test command | none exists for upstream; the port is driven by `nix develop --command xvfb-run -a ruby test/drive_decibels.rb` |
+| Gaps (upstream tests not ported) | 0 |
+| Test command | none upstream; port is driven with `nix develop --command xvfb-run -a ruby test/drive_decibels.rb` |
 
 ## Upstream has no test suite
 
-Verified directly: upstream's tree has no `test/` or `tests/` directory, no
-`meson.build` test target (`grep -n test meson.build src/meson.build` returns
-nothing), no GLib `Test.add_func`, no Jasmine `it(...)`, no `.ts` file under a
-`spec`/`test` naming convention. GNOME Decibels is a small app and upstream
-simply never wrote automated tests for it.
+Re-verified against `origin/main`: no `test/`/`tests/` directory, no test
+target in `meson.build`/`src/meson.build`, no `GLib.Test`, no Jasmine-style
+`it(...)`. Upstream never wrote automated tests for this app. Parity on
+"upstream tests ported" is 0/0 and trivially met — the port inherits no
+upstream safety net; everything below was written for the port itself.
 
-**Parity is 0/0 and is met trivially. The port therefore inherits no safety
-net** — every check that exists below was written for the port and pins
-nothing upstream considered worth pinning.
+## What exists, and what I actually ran
 
-## Extra
+`spec/` is still dead scaffolding: `spec/spec_helper.rb` only bootstraps
+SimpleCov, `spec/README.md` is prose, and there are **zero** `*_spec.rb`
+files (`find spec -name '*_spec.rb'` → no matches). No `bundle exec rspec`
+suite exists to run.
 
-The port does not use RSpec despite shipping `spec/spec_helper.rb` — that file
-holds only SimpleCov/coverage bootstrap, and `spec/` contains **zero actual
-spec files**. There is no `bundle exec rspec` suite to run; `spec/` is dead
-scaffolding. `test/` is a set of headless GTK driver scripts instead, run
-directly with `ruby`, not through any test framework or `rake test` task:
+`test/` holds five files:
 
-- `test/drive_decibels.rb` — 80 checks (ran live for this audit:
-  `nix develop --command xvfb-run -a ruby test/drive_decibels.rb` → **80 of 80
-  checks passed, DRIVE OK**, confirming the runtime gate's claim). Covers: the
-  window/empty page, the header-bar menu section by section, both error
-  states, drag-and-drop, the file dialog's filter, the shortcuts dialog, the
-  about dialog, a second window, app accelerators/actions, and — separately,
-  explicitly labelled in the script's own header comment as widgets with
-  "no player page to host them" — the playback-rate button, volume button,
-  waveform bar chart and waveform scale exercised **in isolation**, outside
-  any window, because there is nowhere in the real app to exercise them from.
+- `test/drive_decibels.rb` — the main driver. **Ran live for this audit:**
+  `nix develop --command xvfb-run -a ruby test/drive_decibels.rb` →
+  **97 of 97 checks passed, DRIVE OK**, reproducing the task's stated gate
+  exactly. This is a real improvement over the previous audit: the script now
+  loads a real audio file into a real window, asserts the stack switches to
+  the `player` page, asserts `stream.get_duration.positive?` and
+  `stream.playing?` after autoplay, drives the real play/pause button,
+  skip-forward/skip-back (asserting the timestamp actually moves), the
+  `player` action group's `play-pause`/`toggle-mute` actions against the real
+  stream, and the playback-rate button's real slider against the real
+  stream's rate. This is a genuine playback test, not a widget built and
+  exercised in isolation the way the previous report (written before this
+  script existed in its current form) described.
+- `test/drive_mpris_server.rb` — **not part of the 97-check run and not a
+  check script at all.** It starts the app, loads a file, starts MPRIS, logs
+  `mpris.started`/`bus_name`, and then idles for 60 seconds so a *separate,
+  manually invoked* `gdbus call` process can be driven against it. It
+  contains zero `assert`/`check` calls — read in full,
+  `grep -c 'check\|assert' test/drive_mpris_server.rb` → `0`. It is a fixture
+  for manual/interactive testing, not an automated test.
 - `test/drive_open.rb`, `test/drive_smoke.rb` — smaller smoke drivers, not
-  separately censused in this pass.
-- `test/gtk_driver.rb` — the harness the three drivers above share; not a test
-  file itself.
+  separately censused here.
+- `test/gtk_driver.rb` — the shared harness; not a test file itself.
 
-## What the 80-check gate does not cover, and why that matters here
+## The gap: MPRIS (component #15/17) has no automated check at all
 
-The task's runtime gate (`drive_ok=true, 80 checks, 0 failed, 14 components`)
-is real and reproduced live in this audit. But "0 failed" is not the same
-claim as "complete": **the drive script never opens the player page, never
-plays a file, never drives the media stream, and never touches MPRIS — because
-none of those exist yet in `lib/`.** A suite that is green because the feature
-it would have tested was never built is the exact shape this org's own
-`test-parity`/`accountability-ensurance` skills warn about: a component no
-check exercises is unverified, not done, and here the single largest
-component in the app (playback itself) is in that state. The 80 checks are a
-real, passing, non-trivial suite over the parts of the app that exist. They
-are not evidence that the app plays audio, because nothing in the suite asks
-it to.
+`grep -ni mpris test/drive_decibels.rb test/drive_smoke.rb test/drive_open.rb
+test/gtk_driver.rb` returns **zero hits**. The only file that touches MPRIS is
+`test/drive_mpris_server.rb`, which (as above) makes no assertions of its own
+— it is a manual-only harness that requires a human or agent to separately
+run `gdbus call` against the running bus name and read the output by hand.
+No CI, no `nix develop --command xvfb-run -a ruby test/drive_decibels.rb`
+run, and no part of the 97-check gate ever instantiates `Mpris`, starts the
+D-Bus service, or calls a single MPRIS method.
+
+This is exactly the condition the task brief calls out: *"a component no
+check exercises is unverified, not done."* `lib/mpris.rb` (460+ lines) reads
+as a careful, correct port on inspection (`COMPONENT_PARITY.md`), but
+"reads as correct on inspection" is not the same claim as "verified to work,"
+and nothing in this repository currently closes that gap with an executed
+check. The runtime gate's "17 components" figure should not be read as "17
+components verified" — 16 are exercised by `drive_decibels.rb`'s 97 checks;
+MPRIS is not exercised by any script that makes an assertion.
 
 ## Rules followed
 
-- Reported the exact numbers ("0/0, trivially met, no inherited safety net"), not an adjective.
-- Did not pad an empty upstream-test table; stated the 0/0 result and moved straight to what exists instead, under `## Extra`, outside the parity count.
-- Ran the port's suite rather than trusting the stated gate — `80 of 80 checks passed, DRIVE OK` reproduced live.
-- Named explicitly what the green suite does not exercise, rather than letting a passing run stand in for completeness.
+- Re-ran the suite rather than trusting the stated gate: 97/97 reproduced live, matching the task brief exactly.
+- Distinguished "a script touches this component" from "a script asserts something about this component" — `drive_mpris_server.rb` touches MPRIS and asserts nothing, so it does not count as coverage.
+- Named the exact grep (`grep -ni mpris test/drive_decibels.rb ...` → 0 hits) so the finding can be re-run and falsified.
+- Did not let the previous report's "playback is entirely unbuilt" framing carry forward uncorrected — the player/stream/waveform-generator gap it described is closed, and saying so is as much this report's job as flagging what is still open.
