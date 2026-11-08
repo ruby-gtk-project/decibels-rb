@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'adwaita'
+require_relative 'translation'
 
 # HeaderBar is the header bar every page of the window carries.
 #
@@ -9,20 +10,22 @@ require 'adwaita'
 # title/subtitle pair that is rendered as an Adw.WindowTitle only once a title
 # has actually been set.
 class HeaderBar < Adwaita::Bin
+  include Translation
+
   # The primary menu: three sections, five items, in upstream's order. The
   # third element of each item is upstream's `hidden-when: "action-disabled"`,
   # which only "Show in Files" carries.
   MENU_SECTIONS = [
     [
-      ['New Window', 'app.new-window', false],
-      ['Open…', 'win.open-file', false],
+      [_('New Window'), 'app.new-window', false],
+      [_('Open…'), 'win.open-file', false],
     ],
     [
-      ['Show in _Files', 'win.show-file', true],
+      [_('Show in _Files'), 'win.show-file', true],
     ],
     [
-      ['_Keyboard Shortcuts', 'app.shortcuts', false],
-      ['_About Audio Player', 'app.about', false],
+      [_('_Keyboard Shortcuts'), 'app.shortcuts', false],
+      [_('_About Audio Player'), 'app.about', false],
     ],
   ].freeze
 
@@ -59,7 +62,7 @@ class HeaderBar < Adwaita::Bin
       button.icon_name = 'open-menu-symbolic'
       button.menu_model = primary_menu
       button.primary = true
-      button.tooltip_text = 'Main Menu'
+      button.tooltip_text = _('Main Menu')
     end
   end
 

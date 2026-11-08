@@ -6,6 +6,7 @@ require_relative 'waveform_scale'
 require_relative 'playback_rate_button'
 require_relative 'volume_button'
 require_relative 'media_stream' # GstAudio's cubic/linear volume conversion loads as its side effect.
+require_relative 'translation'
 
 # PlayerState is the page shown once a file has been accepted.
 #
@@ -22,6 +23,8 @@ require_relative 'media_stream' # GstAudio's cubic/linear volume conversion load
 # notifications, the same adaptation PlaybackRateButton and VolumeButton
 # themselves already use one level down.
 class PlayerState < Adwaita::Bin
+  include Translation
+
   attr_reader :header_bar
 
   def initialize(stream)
@@ -132,7 +135,7 @@ class PlayerState < Adwaita::Bin
     def playback_rate_button
       @playback_rate_button ||= PlaybackRateButton.new(on_rate_change: method(:change_rate)).tap do |button|
         button.valign = :center
-        button.tooltip_text = 'Adjust Playback Speed'
+        button.tooltip_text = _('Adjust Playback Speed')
       end
     end
 
@@ -158,7 +161,7 @@ class PlayerState < Adwaita::Bin
       @skip_back_button ||= Gtk::Button.new.tap do |button|
         button.icon_name = 'skip-backwards-10-symbolic'
         button.valign = :center
-        button.tooltip_text = 'Skip Back 10s'
+        button.tooltip_text = _('Skip Back 10s')
         button.add_css_class('circular')
         button.signal_connect('clicked') { @stream.skip_seconds(-10) }
       end
@@ -168,7 +171,7 @@ class PlayerState < Adwaita::Bin
       @skip_forward_button ||= Gtk::Button.new.tap do |button|
         button.icon_name = 'skip-forward-10-symbolic'
         button.valign = :center
-        button.tooltip_text = 'Skip Forward 10s'
+        button.tooltip_text = _('Skip Forward 10s')
         button.add_css_class('circular')
         button.signal_connect('clicked') { @stream.skip_seconds(10) }
       end
@@ -211,10 +214,10 @@ class PlayerState < Adwaita::Bin
     def sync_playback
       if @stream.playing?
         playback_image.icon_name = 'pause-large-symbolic'
-        playback_button.tooltip_text = 'Pause'
+        playback_button.tooltip_text = _('Pause')
       else
         playback_image.icon_name = 'play-large-symbolic'
-        playback_button.tooltip_text = 'Play'
+        playback_button.tooltip_text = _('Play')
       end
     end
 

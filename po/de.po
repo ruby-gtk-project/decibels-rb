@@ -1,0 +1,184 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr ""
+"Philipp Kiemle <philipp.kiemle@gmail.com>\n"
+"Gabriel Brand <gabr.brand@gmail.com>\n"
+"Jürgen Benvenuti <gastornis@posteo.org>\n"
+"Christian Kirbach <Christian.Kirbach@googlemail.com>"
+
+msgid "Drop Here to Open"
+msgstr "Hier ablegen zum Öffnen"
+
+msgid "Unable to access dropped files"
+msgstr "Zugriff auf abgelegte Dateien fehlgeschlagen"
+
+msgid "Play Audio Files"
+msgstr "Audiodateien abspielen"
+
+msgid "Drag and drop audio files here"
+msgstr "Audiodateien hierhin ziehen und ablegen"
+
+msgid "_Open…"
+msgstr "Ö_ffnen …"
+
+msgid "File Cannot Be Played"
+msgstr "Datei kann nicht abgespielt werden"
+
+msgid "An unknown error happened"
+msgstr "Ein unbekannter Fehler ist aufgetreten"
+
+msgid "_Try Again…"
+msgstr "Erneu_t versuchen …"
+
+msgid "New Window"
+msgstr "Neues Fenster"
+
+msgid "Open…"
+msgstr "Öffnen …"
+
+msgid "Show in _Files"
+msgstr "In Date_ien anzeigen"
+
+msgid "_Keyboard Shortcuts"
+msgstr "_Tastenkürzel"
+
+msgid "_About Audio Player"
+msgstr "_Info zu Audioplayer"
+
+msgid "Main Menu"
+msgstr "Hauptmenü"
+
+msgid "Audio Player"
+msgstr "Audioplayer"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr ""
+"Datei ist in einem nicht abspielbaren Format. Zusätzliche Media-Codecs könnten"
+" erforderlich sein."
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr ""
+"Während des Holens von Informationen über die Datei ist ein Fehler aufgetreten"
+". Bitte versuchen Sie es noch einmal."
+
+msgid "File uses an invalid URI"
+msgstr "Datei verwendet eine ungültige Adresse"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr ""
+"Das Lesen der Dateiinformationen wurde abgebrochen. Bitte versuchen Sie es ern"
+"eut."
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "Die ausgewählte Datei enthält kein Audio"
+
+msgid "Unknown File"
+msgstr "Unbekannte Datei"
+
+msgid "Adjust Playback Speed"
+msgstr "Wiedergabegeschwindigkeit anpassen"
+
+msgid "Skip Back 10s"
+msgstr "10s zurück springen"
+
+msgid "Skip Forward 10s"
+msgstr "10s vor springen"
+
+msgid "Pause"
+msgstr "Pausieren"
+
+msgid "Play"
+msgstr "Abspielen"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Allgemein"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Tastenkürzel anzeigen"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Neues Fenster"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Beenden"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "Player"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "Datei öffnen"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "Pausieren/Abspielen"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "10 Sekunden zurückgehen"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "10 Sekunden vorgehen"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "Wiedergabegeschwindigkeit"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "Schneller wiedergeben"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "Langsamer wiedergeben"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "Wiedergabegeschwindigkeit zurücksetzen"
+
+msgid "Mute/Unmute"
+msgstr "Stumm schalten/Stummschaltung aufheben"
+
+msgid "Muted"
+msgstr "Stumm geschaltet"
+
+msgid "Full Volume"
+msgstr "Volle Lautstärke"
+
+msgid "No available audio file found"
+msgstr "Keine verfügbare Audiodatei gefunden"
+
+msgid "No file was selected"
+msgstr "Keine Datei wurde ausgewählt"
+
+msgid "Directories Cannot Be Played"
+msgstr "Ordner können nicht abgespielt werden"
+
+msgid "Please select a file."
+msgstr "Bitte wählen Sie eine Datei aus."
+
+msgid "The selected file is not a regular file."
+msgstr "Die ausgewählte Datei ist keine reguläre Datei."
+
+msgid "Open File"
+msgstr "Datei öffnen"
+
+msgid "Audio files"
+msgstr "Audiodateien"

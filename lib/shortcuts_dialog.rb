@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'adwaita'
+require_relative 'translation'
 
 # ShortcutsDialog lists the keyboard shortcuts.
 #
@@ -8,24 +9,30 @@ require 'adwaita'
 # with three sections — General, Player and Playback Rate — and the ten items
 # it declares, in order. Items upstream gives an `action-name` take their
 # accelerator from the application; the ones it spells out as `accelerator`
-# are listed here with the same accelerator strings.
+# are listed here with the same accelerator strings. Every title and label
+# carries upstream's own `C_("shortcut window", ...)` context — ported here
+# as Translation#p_, the name ruby-gettext's extractor recognizes — since
+# the same English word (e.g. "Open File") can translate differently inside
+# a shortcuts window than it would elsewhere.
 class ShortcutsDialog < Adwaita::ShortcutsDialog
+  include Translation
+
   SECTIONS = {
-    'General'       => [
-      ['Show Shortcuts', 'app.shortcuts'],
-      ['New Window', 'app.new-window'],
-      ['Quit', 'app.quit'],
+    p_('shortcut window', 'General')       => [
+      [p_('shortcut window', 'Show Shortcuts'), 'app.shortcuts'],
+      [p_('shortcut window', 'New Window'), 'app.new-window'],
+      [p_('shortcut window', 'Quit'), 'app.quit'],
     ],
-    'Player'        => [
-      ['Open File', 'win.open-file'],
-      ['Pause/Play', 'space'],
-      ['Go Back 10 Seconds', 'Left'],
-      ['Go Forward 10 Seconds', 'Right'],
+    p_('shortcut window', 'Player')        => [
+      [p_('shortcut window', 'Open File'), 'win.open-file'],
+      [p_('shortcut window', 'Pause/Play'), 'space'],
+      [p_('shortcut window', 'Go Back 10 Seconds'), 'Left'],
+      [p_('shortcut window', 'Go Forward 10 Seconds'), 'Right'],
     ],
-    'Playback Rate' => [
-      ['Increase Playback Rate', '<Ctrl>plus plus'],
-      ['Decrease Playback Rate', '<Ctrl>minus minus'],
-      ['Reset Playback Rate', '<Ctrl>0 0'],
+    p_('shortcut window', 'Playback Rate') => [
+      [p_('shortcut window', 'Increase Playback Rate'), '<Ctrl>plus plus'],
+      [p_('shortcut window', 'Decrease Playback Rate'), '<Ctrl>minus minus'],
+      [p_('shortcut window', 'Reset Playback Rate'), '<Ctrl>0 0'],
     ],
   }.freeze
 

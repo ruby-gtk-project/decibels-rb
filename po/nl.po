@@ -1,0 +1,183 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr ""
+"Heimen Stoffels <vistausss@fastmail.com>\n"
+"Nathan Follens <nfollens@gnome.org>\n"
+"Meer info over GNOME-NL https://nl.gnome.org"
+
+msgid "Drop Here to Open"
+msgstr "Versleep om te openen"
+
+msgid "Unable to access dropped files"
+msgstr "U hebt geen toegang tot de bestanden"
+
+msgid "Play Audio Files"
+msgstr "Speel audiobestanden af"
+
+msgid "Drag and drop audio files here"
+msgstr "Versleep audiobestanden hiernaartoe"
+
+msgid "_Open…"
+msgstr "_Openen…"
+
+msgid "File Cannot Be Played"
+msgstr "Dit bestand kan niet afgespeeld worden"
+
+msgid "An unknown error happened"
+msgstr "Er is een onbekende fout opgetreden"
+
+msgid "_Try Again…"
+msgstr "O_pnieuw proberen…"
+
+msgid "New Window"
+msgstr "Nieuw venster"
+
+msgid "Open…"
+msgstr "Openen…"
+
+msgid "Show in _Files"
+msgstr "Tonen in _Bestanden"
+
+msgid "_Keyboard Shortcuts"
+msgstr "_Sneltoetsen"
+
+msgid "_About Audio Player"
+msgstr "_Over Audiospeler"
+
+msgid "Main Menu"
+msgstr "Hoofdmenu"
+
+msgid "Audio Player"
+msgstr "Audiospeler"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr ""
+"Dit bestandsformaat wordt niet ondersteund. Wellicht zijn er aanvullende codec"
+"s beschikbaar."
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr ""
+"Er is een fout opgetreden tijdens het ophalen van de bestandsinformatie. Probe"
+"er het opnieuw."
+
+msgid "File uses an invalid URI"
+msgstr "Het bestand heeft een ongeldige URI"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr ""
+"Er is een time-out opgetreden tijdens het ophalen van de bestandsinformatie. P"
+"robeer het opnieuw."
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "Het gekozen bestand bevat geen audio"
+
+msgid "Unknown File"
+msgstr "Onbekend bestandstype"
+
+msgid "Adjust Playback Speed"
+msgstr "Afspeelsnelheid aanpassen"
+
+msgid "Skip Back 10s"
+msgstr "10 seconden terug"
+
+msgid "Skip Forward 10s"
+msgstr "10 seconden verder"
+
+msgid "Pause"
+msgstr "Pauzeren"
+
+msgid "Play"
+msgstr "Afspelen"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Algemeen"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Sneltoetsen tonen"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Nieuw venster"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Afsluiten"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "Speler"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "Bestand openen"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "Pauzeren/afspelen"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "Ga 10 seconden terug"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "Ga 10 seconden verder"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "Afspeelsnelheid"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "Afspeelsnelheid verhogen"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "Afspeelsnelheid verlagen"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "Afspeelsnelheid herstellen"
+
+msgid "Mute/Unmute"
+msgstr "Geluid dempen/aanzetten"
+
+msgid "Muted"
+msgstr "Gedempt"
+
+msgid "Full Volume"
+msgstr "Maximaal volume"
+
+msgid "No available audio file found"
+msgstr "Geen beschikbaar audiobestand gevonden"
+
+msgid "No file was selected"
+msgstr "Geen bestand geselecteerd"
+
+msgid "Directories Cannot Be Played"
+msgstr "Mappen kunnen niet afgespeeld worden"
+
+msgid "Please select a file."
+msgstr "Selecteer een bestand."
+
+msgid "The selected file is not a regular file."
+msgstr "Het gekozen bestand is geen normaal bestand."
+
+msgid "Open File"
+msgstr "Bestand openen"
+
+msgid "Audio files"
+msgstr "Audiobestanden"

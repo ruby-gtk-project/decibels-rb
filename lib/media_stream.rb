@@ -2,6 +2,7 @@
 
 require 'gtk4'
 require 'gstreamer'
+require_relative 'translation'
 require_relative 'waveform_generator'
 
 # GStreamer's boxed/value GTypes (TagList, Structure, and the rest GstPlay's
@@ -57,17 +58,19 @@ end
 # the exception that method raises for a bad URI is an ordinary Ruby
 # exception, not a signal parameter, and marshals back safely.
 class MediaStream < Gtk::MediaStream
+  include Translation
+
   type_register
 
   LOWER_RATE = 0.5
   UPPER_RATE = 3.0
   DEFAULT_RATE = 1.0
 
-  CANNOT_BE_PLAYED = "File uses a format that cannot be played. Additional media codecs may be required."
-  DISCOVER_FAILED = "An error happened while trying to get information about the file. Please try again."
-  INVALID_URI = 'File uses an invalid URI'
-  TIMED_OUT = 'Reading the file’s information timed out. Please try again.'
-  NO_AUDIO = 'The selected file doesn’t contain any audio'
+  CANNOT_BE_PLAYED = _("File uses a format that cannot be played. Additional media codecs may be required.")
+  DISCOVER_FAILED = _("An error happened while trying to get information about the file. Please try again.")
+  INVALID_URI = _('File uses an invalid URI')
+  TIMED_OUT = _('Reading the file’s information timed out. Please try again.')
+  NO_AUDIO = _('The selected file doesn’t contain any audio')
 
   attr_reader :waveform_generator, :file, :media_info
 
@@ -120,7 +123,7 @@ class MediaStream < Gtk::MediaStream
     elsif file_name
       file_name
     else
-      backend.uri || 'Unknown File'
+      backend.uri || _('Unknown File')
     end
   end
 
@@ -210,6 +213,18 @@ class MediaStream < Gtk::MediaStream
   def virtual_do_update_audio(wants_muted, requested_volume)
     backend.mute = wants_muted
     backend.volume = requested_volume
+  end
+
+  # Upstream's reset: drop the tags, restart the discoverer and the
+  # waveform generator, and stop the current pipeline. Public because
+  # Window#build's close-request handler calls it directly, mirroring
+  # upstream's vfunc_close_request.
+  def reset
+    @tags = nil
+    @media_info = nil
+    @discoverer_generation += 1
+    waveform_generator.restart
+    stop
   end
 
   private
@@ -377,16 +392,6 @@ class MediaStream < Gtk::MediaStream
       else
         0
       end
-    end
-
-    # Upstream's reset: drop the tags, restart the discoverer and the
-    # waveform generator, and stop the current pipeline.
-    def reset
-      @tags = nil
-      @media_info = nil
-      @discoverer_generation += 1
-      waveform_generator.restart
-      stop
     end
 
     # Discovery runs `discover_uri` (blocking) on a Ruby Thread and hands

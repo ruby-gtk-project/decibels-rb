@@ -1,0 +1,178 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr "Сергей Ворон <voron@duck.com>"
+
+msgid "Drop Here to Open"
+msgstr "Бросьте сюда, чтобы открыть"
+
+msgid "Unable to access dropped files"
+msgstr "Невозможно получить доступ к удаленным файлам"
+
+msgid "Play Audio Files"
+msgstr "Воспроизведение аудиофайлов"
+
+msgid "Drag and drop audio files here"
+msgstr "Перетащите аудиофайлы сюда"
+
+msgid "_Open…"
+msgstr "_Открыть…"
+
+msgid "File Cannot Be Played"
+msgstr "Невозможно воспроизвести файл"
+
+msgid "An unknown error happened"
+msgstr "Произошла неизвестная ошибка"
+
+msgid "_Try Again…"
+msgstr "_Попробуйте еще раз…"
+
+msgid "New Window"
+msgstr "Новое окно"
+
+msgid "Open…"
+msgstr "Открыть…"
+
+msgid "Show in _Files"
+msgstr "Показать в _Файлах"
+
+msgid "_Keyboard Shortcuts"
+msgstr "_Комбинации клавиш"
+
+msgid "_About Audio Player"
+msgstr "_О приложении"
+
+msgid "Main Menu"
+msgstr "Главное меню"
+
+msgid "Audio Player"
+msgstr "Аудиопроигрыватель"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr ""
+"Файл использует формат, который невозможно воспроизвести. Возможно, потребуютс"
+"я дополнительные медиакодеки."
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr ""
+"Произошла ошибка при попытке получить информацию о файле. Пожалуйста, попробуй"
+"те еще раз."
+
+msgid "File uses an invalid URI"
+msgstr "Файл использует недопустимый URI"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr "Чтение информации о файле прервано. Пожалуйста, попробуйте еще раз."
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "Выбранный файл не содержит аудио"
+
+msgid "Unknown File"
+msgstr "Неизвестный файл"
+
+msgid "Adjust Playback Speed"
+msgstr "Настройка скорости воспроизведения"
+
+msgid "Skip Back 10s"
+msgstr "Перейти на 10 секунд назад"
+
+msgid "Skip Forward 10s"
+msgstr "Перейти на 10 секунд вперед"
+
+msgid "Pause"
+msgstr "Пауза"
+
+msgid "Play"
+msgstr "Воспроизведение"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Общие"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Показать комбинации клавиш"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Новое окно"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Закрыть"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "Проигрыватель"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "Открыть файл"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "Пауза/Воспроизведение"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "Перейти на 10 секунд назад"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "Перейти на 10 секунд вперед"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "Скорость воспроизведения"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "Увеличить скорость воспроизведения"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "Уменьшить скорость воспроизведения"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "Сбросить скорость воспроизведения"
+
+msgid "Mute/Unmute"
+msgstr "Выключить/включить звук"
+
+msgid "Muted"
+msgstr "Без звука"
+
+msgid "Full Volume"
+msgstr "Полная громкость"
+
+msgid "No available audio file found"
+msgstr "Доступный аудиофайл не найден"
+
+msgid "No file was selected"
+msgstr "Не выбран файл"
+
+msgid "Directories Cannot Be Played"
+msgstr "Каталоги не могут быть воспроизведены"
+
+msgid "Please select a file."
+msgstr "Пожалуйста, выберите файл."
+
+msgid "The selected file is not a regular file."
+msgstr "Выбранный файл не является обычным файлом."
+
+msgid "Open File"
+msgstr "Открыть файл"
+
+msgid "Audio files"
+msgstr "Аудиофайлы"

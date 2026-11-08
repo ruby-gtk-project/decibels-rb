@@ -2,6 +2,7 @@
 
 require 'adwaita'
 require_relative 'header_bar'
+require_relative 'translation'
 
 # EmptyState is the page shown before any file has been opened.
 #
@@ -10,8 +11,10 @@ require_relative 'header_bar'
 # Adw.StatusPage with the application's own symbolic icon and a pill
 # suggested-action button bound to win.open-file.
 class EmptyState < Adwaita::Bin
-  TITLE = 'Play Audio Files'
-  DESCRIPTION = 'Drag and drop audio files here'
+  include Translation
+
+  TITLE = _('Play Audio Files')
+  DESCRIPTION = _('Drag and drop audio files here')
 
   attr_reader :header_bar
 
@@ -51,7 +54,7 @@ class EmptyState < Adwaita::Bin
   def box = @box ||= Gtk::Box.new(:vertical, 12)
 
   def open_button
-    @open_button ||= Gtk::Button.new(label: '_Open…').tap do |button|
+    @open_button ||= Gtk::Button.new(label: _('_Open…')).tap do |button|
       button.use_underline = true
       button.action_name = 'win.open-file'
       button.can_shrink = true

@@ -1,0 +1,182 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr ""
+"Julián Villodre <jvillodrede@gmail.com>, 2024-2025\n"
+"Óscar Fernández Díaz <oscfdezdz@tuta.io>"
+
+msgid "Drop Here to Open"
+msgstr "Suelte aquí para abrir"
+
+msgid "Unable to access dropped files"
+msgstr "No se puede acceder a los archivos eliminados"
+
+msgid "Play Audio Files"
+msgstr "Reproducir archivos de sonido"
+
+msgid "Drag and drop audio files here"
+msgstr "Arrastre y suelte archivos de sonido aquí"
+
+msgid "_Open…"
+msgstr "A_brir…"
+
+msgid "File Cannot Be Played"
+msgstr "No se puede reproducir el archivo"
+
+msgid "An unknown error happened"
+msgstr "Ocurrió un error desconocido"
+
+msgid "_Try Again…"
+msgstr "_Intentar de nuevo…"
+
+msgid "New Window"
+msgstr "Nueva ventana"
+
+msgid "Open…"
+msgstr "Abrir…"
+
+msgid "Show in _Files"
+msgstr "_Mostrar en Archivos"
+
+msgid "_Keyboard Shortcuts"
+msgstr "Atajos del _teclado"
+
+msgid "_About Audio Player"
+msgstr "_Acerca del reproductor de sonido"
+
+msgid "Main Menu"
+msgstr "Menú principal"
+
+msgid "Audio Player"
+msgstr "Reproductor de sonido"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr ""
+"El archivo usa un formato que no se puede reproducir. Es posible que se necesi"
+"ten códecs multimedia adicionales."
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr ""
+"Ocurrió un error al intentar obtener información sobre el archivo. Inténtelo d"
+"e nuevo."
+
+msgid "File uses an invalid URI"
+msgstr "El archivo usa una URI no válida"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr ""
+"Se agotó el tiempo de lectura de la información del archivo. Inténtelo de nuev"
+"o."
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "El archivo seleccionado no contiene sonido"
+
+msgid "Unknown File"
+msgstr "Archivo desconocido"
+
+msgid "Adjust Playback Speed"
+msgstr "Ajustar la velocidad de reproducción"
+
+msgid "Skip Back 10s"
+msgstr "Retroceder 10s"
+
+msgid "Skip Forward 10s"
+msgstr "Avanzar 10s"
+
+msgid "Pause"
+msgstr "Pausar"
+
+msgid "Play"
+msgstr "Reproducir"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "General"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Mostrar atajos"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Nueva ventana"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Salir"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "Reproductor"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "Abrir archivo"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "Pausar/Reproducir"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "Retroceder 10 segundos"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "Avanzar 10 segundos"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "Velocidad de reproducción"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "Aumentar velocidad de reproducción"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "Disminuir velocidad de reproducción"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "Reiniciar velocidad de reproducción"
+
+msgid "Mute/Unmute"
+msgstr "Silenciar/Activar silencio"
+
+msgid "Muted"
+msgstr "Silenciado"
+
+msgid "Full Volume"
+msgstr "Volumen al máximo"
+
+msgid "No available audio file found"
+msgstr "No se encontró ningún archivo de sonido disponible"
+
+msgid "No file was selected"
+msgstr "No se seleccionó ningún archivo"
+
+msgid "Directories Cannot Be Played"
+msgstr "Las carpetas no se pueden reproducir"
+
+msgid "Please select a file."
+msgstr "Seleccione un archivo."
+
+msgid "The selected file is not a regular file."
+msgstr "El archivo seleccionado no es un archivo admitido."
+
+msgid "Open File"
+msgstr "Abrir archivo"
+
+msgid "Audio files"
+msgstr "Archivos de sonido"

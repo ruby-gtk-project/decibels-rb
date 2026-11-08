@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'adwaita'
+require_relative 'translation'
 
 # AboutDialog is the application's About window.
 #
@@ -15,6 +16,8 @@ require 'adwaita'
 # one appstream file this port ships, which is why it needs no XML parser —
 # Ruby 3.4 unbundled REXML and the runtime bundle carries only the GTK gems.
 class AboutDialog < Adwaita::AboutDialog
+  include Translation
+
   DEVELOPERS = [
     'Angelo Verlain https://vixalien.com',
     'David Keller https://gitlab.com/BlobCodes',
@@ -67,6 +70,7 @@ class AboutDialog < Adwaita::AboutDialog
       dialog.developers = DEVELOPERS
       dialog.artists = ARTISTS
       dialog.designers = DESIGNERS
+      dialog.translator_credits = _('translator-credits')
 
       urls.each { |setter, url| dialog.public_send(setter, url) }
 

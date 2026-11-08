@@ -1,0 +1,178 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr "Adam Lewicki <a.lewicki95@gmail.com>, 2025"
+
+msgid "Drop Here to Open"
+msgstr "Przeciągnij tutaj, aby otworzyć"
+
+msgid "Unable to access dropped files"
+msgstr "Nie można uzyskać dostępu do przeciągniętych plików"
+
+msgid "Play Audio Files"
+msgstr "Odtwarzaj pliki dźwiękowe"
+
+msgid "Drag and drop audio files here"
+msgstr "Przeciągnij pliki dźwiękowe tutaj"
+
+msgid "_Open…"
+msgstr "_Otwórz…"
+
+msgid "File Cannot Be Played"
+msgstr "Nie można odtworzyć pliku"
+
+msgid "An unknown error happened"
+msgstr "Wystąpił nieoczekiwany błąd"
+
+msgid "_Try Again…"
+msgstr "_Spróbuj ponownie…"
+
+msgid "New Window"
+msgstr "Nowe okno"
+
+msgid "Open…"
+msgstr "Otwórz…"
+
+msgid "Show in _Files"
+msgstr "Wyświetl w _Menedżerze plików"
+
+msgid "_Keyboard Shortcuts"
+msgstr "_Skróty klawiszowe"
+
+msgid "_About Audio Player"
+msgstr "_O aplikacji"
+
+msgid "Main Menu"
+msgstr "Menu główne"
+
+msgid "Audio Player"
+msgstr "Odtwarzacz dźwiękowy"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr ""
+"Plik używa formatu, którego nie można odtwarzać. Mogą być wymagane dodatkowe k"
+"odeki."
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr ""
+"Wystąpił błąd podczas próby uzyskania informacji o pliku. Proszę spróbować pon"
+"ownie."
+
+msgid "File uses an invalid URI"
+msgstr "Plik używa nieprawidłowego adresu URI"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr "Przekroczono czas odczytywania informacji o pliku. Proszę spróbować ponownie."
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "Zaznaczony plik nie zawiera żadnego dźwięku"
+
+msgid "Unknown File"
+msgstr "Nieznany plik"
+
+msgid "Adjust Playback Speed"
+msgstr "Reguluj prędkość odtwarzania"
+
+msgid "Skip Back 10s"
+msgstr "Przewiń wstecz 10 sekund"
+
+msgid "Skip Forward 10s"
+msgstr "Przewiń w przód 10 sekund"
+
+msgid "Pause"
+msgstr "Wstrzymaj"
+
+msgid "Play"
+msgstr "Odtwarzaj"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Ogólne"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "Wyświetlanie skrótów"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "Nowe okno"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Zakończenie działania"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "Odtwarzacz"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "Otwarcie pliku"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "Wstrzymanie/odtwarzanie"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "Przewijanie wstecz o 10 sekund"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "Przewijanie w przód o 10 sekund"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "Prędkość odtwarzania"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "Przyspieszanie"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "Zwalnianie"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "Przywrócenie"
+
+msgid "Mute/Unmute"
+msgstr "Wyciszenie/włączenie dźwięku"
+
+msgid "Muted"
+msgstr "Wyciszono"
+
+msgid "Full Volume"
+msgstr "Maksymalna głośność"
+
+msgid "No available audio file found"
+msgstr "Nie odnaleziono plików dźwiękowych"
+
+msgid "No file was selected"
+msgstr "Nie wybrano pliku"
+
+msgid "Directories Cannot Be Played"
+msgstr "Nie nożna odtwarzać katalogów"
+
+msgid "Please select a file."
+msgstr "Proszę wybrać plik."
+
+msgid "The selected file is not a regular file."
+msgstr "Wybrany plik nie jest zwykłym plikiem."
+
+msgid "Open File"
+msgstr "Otwórz plik"
+
+msgid "Audio files"
+msgstr "Pliki dźwiękowe"

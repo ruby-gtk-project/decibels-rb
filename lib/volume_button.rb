@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'adwaita'
+require_relative 'translation'
 
 # VolumeButton is the mute/volume menu button on the player's bottom bar.
 #
@@ -14,6 +15,8 @@ require 'adwaita'
 # PlaybackRateButton) and exposes #volume= / #muted= so the page can sync the
 # button from the stream without re-firing them.
 class VolumeButton < Adwaita::Bin
+  include Translation
+
   LOWER = 0.0
   UPPER = 1.0
   STEP = 0.2
@@ -76,7 +79,7 @@ class VolumeButton < Adwaita::Bin
       @mute_button ||= Gtk::ToggleButton.new.tap do |button|
         button.add_css_class('circular')
         button.add_css_class('flat')
-        button.tooltip_text = 'Mute/Unmute'
+        button.tooltip_text = _('Mute/Unmute')
         button.signal_connect('toggled') { toggle_mute(button.active?) }
       end
     end
@@ -136,11 +139,11 @@ class VolumeButton < Adwaita::Bin
 
     def tooltip_text
       if muted || volume.zero?
-        'Muted'
+        _('Muted')
       elsif volume >= 1.0
-        'Full Volume'
+        _('Full Volume')
       else
-        format('%d %%', (volume * 100).round)
+        format(p_('volume percentage', '%d %%'), (volume * 100).round)
       end
     end
 end

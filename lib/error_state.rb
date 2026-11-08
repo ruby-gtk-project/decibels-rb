@@ -2,6 +2,7 @@
 
 require 'adwaita'
 require_relative 'header_bar'
+require_relative 'translation'
 
 # ErrorState is the page shown when a file cannot be played.
 #
@@ -11,8 +12,10 @@ require_relative 'header_bar'
 # status page's title carries the error's headline and its description the
 # message, exactly as upstream's show_error does.
 class ErrorState < Adwaita::Bin
-  TITLE = 'File Cannot Be Played'
-  UNKNOWN_ERROR = 'An unknown error happened'
+  include Translation
+
+  TITLE = _('File Cannot Be Played')
+  UNKNOWN_ERROR = _('An unknown error happened')
 
   attr_reader :header_bar
 
@@ -59,7 +62,7 @@ class ErrorState < Adwaita::Bin
   def box = @box ||= Gtk::Box.new(:vertical, 12)
 
   def try_again_button
-    @try_again_button ||= Gtk::Button.new(label: '_Try Again…').tap do |button|
+    @try_again_button ||= Gtk::Button.new(label: _('_Try Again…')).tap do |button|
       button.use_underline = true
       button.action_name = 'win.open-file'
       button.can_shrink = true

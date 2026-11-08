@@ -2,6 +2,13 @@
 
 require 'adwaita'
 
+require_relative 'translation'
+
+# Bound before anything below is required: several of those files translate
+# strings into frozen class-body constants, which only ever run once, at
+# load time.
+Translation.bind_text_domain
+
 require_relative 'about_dialog'
 require_relative 'mpris'
 require_relative 'shortcuts_dialog'
@@ -18,8 +25,10 @@ require_relative 'window'
 # window when that window has nothing open, and anything else gets a window of
 # its own.
 class App
+  include Translation
+
   APP_ID = 'org.rubygtkproject.Decibels'
-  APP_NAME = 'Audio Player'
+  APP_NAME = _('Audio Player')
   VERSION = '0.1.0'
 
   # The icon name the empty page shows, which upstream derives from the

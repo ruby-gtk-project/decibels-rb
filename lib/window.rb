@@ -7,6 +7,7 @@ require_relative 'empty_state'
 require_relative 'error_state'
 require_relative 'media_stream'
 require_relative 'player_state'
+require_relative 'translation'
 
 # Window is one audio-player window.
 #
@@ -22,18 +23,20 @@ require_relative 'player_state'
 # widget is held by this class and the pages reach it through callbacks instead
 # of Gtk.Widget#get_root.
 class Window
+  include Translation
+
   WIDTH = 650
   HEIGHT = 450
   MIN_HEIGHT = 260
-  TITLE = 'Audio Player'
+  TITLE = _('Audio Player')
 
-  CANNOT_BE_PLAYED = 'File Cannot Be Played'
-  NOT_FOUND = 'No available audio file found'
-  NO_SELECTION = 'No file was selected'
-  UNREADABLE = 'Couldn’t read the file'
-  DIRECTORY_TITLE = 'Directories Cannot Be Played'
-  DIRECTORY_MESSAGE = 'Please select a file.'
-  IRREGULAR = 'The selected file is not a regular file.'
+  CANNOT_BE_PLAYED = _('File Cannot Be Played')
+  NOT_FOUND = _('No available audio file found')
+  NO_SELECTION = _('No file was selected')
+  UNREADABLE = _('Couldn’t read the file')
+  DIRECTORY_TITLE = _('Directories Cannot Be Played')
+  DIRECTORY_MESSAGE = _('Please select a file.')
+  IRREGULAR = _('The selected file is not a regular file.')
 
   attr_reader :app, :file, :stream
 
@@ -54,6 +57,14 @@ class Window
         win.add_action(open_file_action)
         win.add_action(show_file_action)
         win.insert_action_group('player', stream.action_group)
+
+        # Upstream's vfunc_close_request: reset the stream (tearing down
+        # the GstPlay pipeline and discoverer thread) before the window
+        # actually closes.
+        win.signal_connect('close-request') do
+          stream.reset
+          false
+        end
       end
 
       drag_overlay.content = stack
@@ -69,6 +80,16 @@ class Window
       show_file_action.signal_connect('activate') { show_file }
 
       stream.on_error { |error| show_error(CANNOT_BE_PLAYED, error) }
+
+      # Upstream's four bind_property calls in the constructor: the
+      # stream's title/artist drive both the player page's and the error
+      # page's embedded HeaderBar title/subtitle. There is no GObject
+      # notify signal for title/artist here (MediaStream computes them
+      # from tags on every read rather than storing them as properties),
+      # so this re-reads them whenever the stream reports it has
+      # something new to show instead of binding properties directly.
+      stream.on_loaded { sync_header_bars }
+      stream.on_media_info_updated { sync_header_bars }
     end
   end
 
@@ -149,7 +170,7 @@ class Window
   def file_dialog
     @file_dialog ||= Gtk::FileDialog.new.tap do |dialog|
       dialog.modal = true
-      dialog.title = 'Open File'
+      dialog.title = _('Open File')
       dialog.filters = filters
     end
   end
@@ -162,12 +183,19 @@ class Window
 
   def audio_filter
     @audio_filter ||= Gtk::FileFilter.new.tap do |filter|
-      filter.name = 'Audio files'
+      filter.name = _('Audio files')
       filter.add_mime_type('audio/*')
     end
   end
 
   private
+
+    def sync_header_bars
+      player_state.header_bar.title = stream.title
+      player_state.header_bar.subtitle = stream.artist
+      error_state.header_bar.title = stream.title
+      error_state.header_bar.subtitle = stream.artist
+    end
 
     def accept(file, type)
       case type

@@ -1,0 +1,176 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr ""
+"小山田 純 <oyamadajun@outlook.jp>\n"
+"Ryo Nakano <ryonakaknock3@gmail.com>"
+
+msgid "Drop Here to Open"
+msgstr "ここにドロップして開く"
+
+msgid "Unable to access dropped files"
+msgstr "ドロップされたファイルにアクセスできません"
+
+msgid "Play Audio Files"
+msgstr "音声ファイルを再生"
+
+msgid "Drag and drop audio files here"
+msgstr "音声ファイルをここにドラッグ & ドロップ"
+
+msgid "_Open…"
+msgstr "開く(_O)…"
+
+msgid "File Cannot Be Played"
+msgstr "このファイルは再生できません"
+
+msgid "An unknown error happened"
+msgstr "不明なエラーが起きました"
+
+msgid "_Try Again…"
+msgstr "もう一度試す(_T)…"
+
+msgid "New Window"
+msgstr "新しいウィンドウ"
+
+msgid "Open…"
+msgstr "開く…"
+
+msgid "Show in _Files"
+msgstr "“ファイル”で音声の保存場所を開く(_F)"
+
+msgid "_Keyboard Shortcuts"
+msgstr "キーボードショートカット(_K)"
+
+msgid "_About Audio Player"
+msgstr "“音声プレイヤー”について(_A)"
+
+msgid "Main Menu"
+msgstr "メインメニュー"
+
+msgid "Audio Player"
+msgstr "音声プレイヤー"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr "再生できないフォーマットが使用されたファイルです。追加のメディアコーデックが必要です。"
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr "ファイル情報を取得中にエラーが起きました。もう一度試してください。"
+
+msgid "File uses an invalid URI"
+msgstr "ファイルの URI が無効です"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr "ファイル情報の読み取りにタイムアウトしました。もう一度試してください。"
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "選択されたファイルは、音声を含んでいません"
+
+msgid "Unknown File"
+msgstr "不明なファイル"
+
+msgid "Adjust Playback Speed"
+msgstr "再生速度の調整"
+
+msgid "Skip Back 10s"
+msgstr "10秒巻き戻す"
+
+msgid "Skip Forward 10s"
+msgstr "10秒スキップ"
+
+msgid "Pause"
+msgstr "一時停止"
+
+msgid "Play"
+msgstr "再生"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "全般"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "ショートカットを表示"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "新しいウィンドウ"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "終了する"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "プレイヤー"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "ファイルを開く"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "一時停止/再生"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "10秒巻き戻す"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "10秒スキップ"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "再生速度"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "再生速度を速くする"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "再生速度を遅くする"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "再生速度をリセットする"
+
+msgid "Mute/Unmute"
+msgstr "ミュート/ミュート解除"
+
+msgid "Muted"
+msgstr "ミュート"
+
+msgid "Full Volume"
+msgstr "最大音量"
+
+msgid "No available audio file found"
+msgstr "使用できるファイルがありません"
+
+msgid "No file was selected"
+msgstr "ファイルが選択されていません"
+
+msgid "Directories Cannot Be Played"
+msgstr "フォルダーは再生できません"
+
+msgid "Please select a file."
+msgstr "ファイルを1つ選択してください。"
+
+msgid "The selected file is not a regular file."
+msgstr "選択されたファイルは、通常ファイル (regular file) ではありません。"
+
+msgid "Open File"
+msgstr "ファイルを開く"
+
+msgid "Audio files"
+msgstr "音声ファイル"

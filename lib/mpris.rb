@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'gtk4'
+require_relative 'translation'
 
 # Mpris puts the app on the desktop's org.mpris.MediaPlayer2 D-Bus media
 # controls (sound indicators, media-key daemons, "now playing" widgets).
@@ -29,6 +30,8 @@ require 'gtk4'
 # stream actually has a track loaded so a brand new, still-empty window
 # never gets reported as playing "Unknown File".
 class Mpris
+  include Translation
+
   OBJECT_PATH = '/org/mpris/MediaPlayer2'
 
   INTROSPECTABLE_IFACE = 'org.freedesktop.DBus.Introspectable'
@@ -378,7 +381,7 @@ class Mpris
       when 'Fullscreen', 'CanSetFullscreen', 'HasTrackList'
         '<false>'
       when 'Identity'
-        "<#{quote('Audio Player')}>"
+        "<#{quote(_('Audio Player'))}>"
       when 'DesktopEntry'
         "<#{quote(App::APP_ID)}>"
       when 'SupportedUriSchemes', 'SupportedMimeTypes'

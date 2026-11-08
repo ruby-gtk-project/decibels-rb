@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'adwaita'
+require_relative 'translation'
 
 # DragOverlay reveals a drop target over the window's content.
 #
@@ -14,8 +15,10 @@ require 'adwaita'
 # Upstream routes its `content` child through vfunc_add_child so Blueprint can
 # write `[content]`; this port exposes that as a `content=` writer instead.
 class DragOverlay < Adwaita::Bin
-  TITLE = 'Drop Here to Open'
-  NO_FILES = 'Unable to access dropped files'
+  include Translation
+
+  TITLE = _('Drop Here to Open')
+  NO_FILES = _('Unable to access dropped files')
 
   def initialize(on_file:, on_error:)
     super()

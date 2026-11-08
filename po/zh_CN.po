@@ -1,0 +1,176 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: decibels\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "translator-credits"
+msgstr ""
+"GeniusAlray <GeniusAlray@outlook.com>, 2024.\n"
+"lumingzh <lumingzh@qq.com>, 2024-2026."
+
+msgid "Drop Here to Open"
+msgstr "拖放到这里以打开"
+
+msgid "Unable to access dropped files"
+msgstr "无法访问拖放的文件"
+
+msgid "Play Audio Files"
+msgstr "播放音频文件"
+
+msgid "Drag and drop audio files here"
+msgstr "拖放音频文件到这里"
+
+msgid "_Open…"
+msgstr "打开(_O)…"
+
+msgid "File Cannot Be Played"
+msgstr "音频无法播放"
+
+msgid "An unknown error happened"
+msgstr "发生未知错误"
+
+msgid "_Try Again…"
+msgstr "重试(_T)…"
+
+msgid "New Window"
+msgstr "新建窗口"
+
+msgid "Open…"
+msgstr "打开…"
+
+msgid "Show in _Files"
+msgstr "在文件管理器中显示(_F)"
+
+msgid "_Keyboard Shortcuts"
+msgstr "键盘快捷键(_K)"
+
+msgid "_About Audio Player"
+msgstr "关于音频播放器(_A)"
+
+msgid "Main Menu"
+msgstr "主菜单"
+
+msgid "Audio Player"
+msgstr "音频播放器"
+
+msgid ""
+"File uses a format that cannot be played. Additional media codecs may be requi"
+"red."
+msgstr "文件使用了无法播放的格式，可能需要额外的解码器。"
+
+msgid ""
+"An error happened while trying to get information about the file. Please try a"
+"gain."
+msgstr "获取文件信息时出错，请再试一次"
+
+msgid "File uses an invalid URI"
+msgstr "文件使用了无效的 URI"
+
+msgid "Reading the file’s information timed out. Please try again."
+msgstr "读取文件信息超时。请重试。"
+
+msgid "The selected file doesn’t contain any audio"
+msgstr "选择的文件不包含音频"
+
+msgid "Unknown File"
+msgstr "未知文件"
+
+msgid "Adjust Playback Speed"
+msgstr "调整播放速度"
+
+msgid "Skip Back 10s"
+msgstr "快退 10s"
+
+msgid "Skip Forward 10s"
+msgstr "快进 10s"
+
+msgid "Pause"
+msgstr "暂停"
+
+msgid "Play"
+msgstr "播放"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "常规"
+
+msgctxt "shortcut window"
+msgid "Show Shortcuts"
+msgstr "显示快捷键"
+
+msgctxt "shortcut window"
+msgid "New Window"
+msgstr "新建窗口"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "退出"
+
+msgctxt "shortcut window"
+msgid "Player"
+msgstr "播放器"
+
+msgctxt "shortcut window"
+msgid "Open File"
+msgstr "打开文件"
+
+msgctxt "shortcut window"
+msgid "Pause/Play"
+msgstr "播放/暂停"
+
+msgctxt "shortcut window"
+msgid "Go Back 10 Seconds"
+msgstr "快退 10s"
+
+msgctxt "shortcut window"
+msgid "Go Forward 10 Seconds"
+msgstr "快进 10s"
+
+msgctxt "shortcut window"
+msgid "Playback Rate"
+msgstr "播放速率"
+
+msgctxt "shortcut window"
+msgid "Increase Playback Rate"
+msgstr "增加播放速率"
+
+msgctxt "shortcut window"
+msgid "Decrease Playback Rate"
+msgstr "减少播放速率"
+
+msgctxt "shortcut window"
+msgid "Reset Playback Rate"
+msgstr "重置播放速率"
+
+msgid "Mute/Unmute"
+msgstr "静音/取消静音"
+
+msgid "Muted"
+msgstr "静音"
+
+msgid "Full Volume"
+msgstr "最大音量"
+
+msgid "No available audio file found"
+msgstr "未发现可用音频文件"
+
+msgid "No file was selected"
+msgstr "未选择文件"
+
+msgid "Directories Cannot Be Played"
+msgstr "无法播放目录"
+
+msgid "Please select a file."
+msgstr "请选择一个文件。"
+
+msgid "The selected file is not a regular file."
+msgstr "选择的文件不是常规文件。"
+
+msgid "Open File"
+msgstr "打开文件"
+
+msgid "Audio files"
+msgstr "音频文件"

@@ -67,3 +67,4 @@ group :development do
 end
 gem "adwaita"
 gem "gstreamer"
+gem "gettext", "~> 3.4", require: false
